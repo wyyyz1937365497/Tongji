@@ -1,0 +1,103 @@
+[
+  {
+    "timestamp": "2026-06-28T00:33:33.415204",
+    "request": {
+      "method": "GET",
+      "url": "https://all.tongji.edu.cn/custom/api/v1/rt/card/card_balance?userId=2552304",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "referer": "https://all.tongji.edu.cn/CUS_TEMPLATE_TONGJI/pc/index.html",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "accept": "application/json, text/plain, */*",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "post_data": null
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "transfer-encoding": "chunked",
+        "access-control-allow-origin": "all.tongji.edu.cn",
+        "date": "Sat, 27 Jun 2026 16:33:33 GMT",
+        "content-type": "application/json;charset=UTF-8",
+        "server": "wisedu",
+        "connection": "keep-alive",
+        "access-control-allow-credentials": "true"
+      },
+      "content_type": "application/json;charset=UTF-8",
+      "body": {
+        "msg": "操作成功",
+        "code": "A00000",
+        "data": [
+          {
+            "balance": 563.22,
+            "userId": "2552304"
+          }
+        ]
+      }
+    },
+    "cookies": [
+      {
+        "name": "_idp_authn_lc_key",
+        "value": "1462fdb3-5f09-40f8-805f-b2f6da6c94a5",
+        "domain": ".iam.tongji.edu.cn"
+      },
+      {
+        "name": "SESSION",
+        "value": "OTZjOTE0MDUtODFkZi00ZDQ1LThmYjUtOTgzMzgwYTI2N2Q2",
+        "domain": "iam.tongji.edu.cn"
+      },
+      {
+        "name": "_idp_session",
+        "value": "MTExLjE4Ny4wLjE0NA%3D%3D%7CZmRhMTQxYWYwYWNmZjY5NjNiNmRjMWVjZGRiMzc2ODk4NDRkMmU0ZmNhY2FjMTQxMjgwNTFmNTY0MWI5NTY3Yg%3D%3D%7C021wCorAYWC5SgZ4NbPY1Pn1LVM%3D",
+        "domain": ".iam.tongji.edu.cn"
+      },
+      {
+        "name": "track_cookie_session_id",
+        "value": "89a73b1f-4417-d245-aca5-4ccaf9161af2",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "track_cookie_user_id",
+        "value": "32acfac6-778c-7bb1-b765-23ecb0d4c3c2",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "gwroute-casp-portal",
+        "value": "982b99f4ef75cba47607457eb66fd457",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "COM.WISEDU.CASP.IS_RANDOM",
+        "value": "0",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "COM.WISEDU.CASP.SITEWID",
+        "value": "1256419674023788544",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "WISCPSID",
+        "value": "2281a755-9335-491b-9d8a-1777de787786",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "JSESSIONID",
+        "value": "FBFC89134DE332B0B745CA0CBFBBFFF9",
+        "domain": "all.tongji.edu.cn"
+      },
+      {
+        "name": "x",
+        "value": "x",
+        "domain": "iam.tongji.edu.cn"
+      },
+      {
+        "name": "CASTGC",
+        "value": "TPRkxzKImAOXstRJMjdXxreq1Ueo+qQEDnzshpX6u1y2c8iXtGYanA==",
+        "domain": "all.tongji.edu.cn"
+      }
+    ]
+  }
+]
