@@ -33,7 +33,7 @@ interface TongjiApi {
     suspend fun findMyCommonMsgPublish(@Body body: Map<String, @JvmSuppressWildcards Any>): Response<Map<String, Any>>
 
     @GET("/api/commonservice/commonMsgPublish/findCommonMsgPublishById")
-    suspend fun findCommonMsgPublishById(@Query("id") id: String): Response<Map<String, Any>>
+    suspend fun findCommonMsgPublishById(@Query("id") id: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 
     @GET("/api/commonservice/obsfile/downloadfile")
     suspend fun downloadAttachment(@Query("objectkey") objectKey: String): Response<okhttp3.ResponseBody>

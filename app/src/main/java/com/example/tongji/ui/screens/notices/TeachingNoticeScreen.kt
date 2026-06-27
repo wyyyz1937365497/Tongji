@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.tongji.TongjiApp
@@ -25,6 +26,7 @@ fun TeachingNoticeScreen(onBack: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var selectedNoticeId by remember { mutableStateOf<String?>(null) }
     var noticeDetail by remember { mutableStateOf<Map<String, Any>?>(null) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     fun load() {
         scope.launch {
@@ -38,6 +40,7 @@ fun TeachingNoticeScreen(onBack: () -> Unit) {
     LaunchedEffect(Unit) { load() }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = { Text(if (selectedNoticeId != null) "通知详情" else "通知公告") },
@@ -59,7 +62,8 @@ fun TeachingNoticeScreen(onBack: () -> Unit) {
                             Icon(Icons.Default.Refresh, contentDescription = "刷新")
                         }
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
     ) { padding ->
@@ -138,26 +142,45 @@ private fun NoticeCard(notice: TeachingNoticeEntity, onClick: () -> Unit) {
 
 @Composable
 private fun NoticeDetailView(detail: Map<String, Any>) {
+    val title = detail["title"] as? String ?: ""
+    val publishTime = detail["publishTime"] as? String ?: ""
+    val createUser = detail["createUser"] as? String ?: ""
+    val contentHtml = detail["content"] as? String ?: ""
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Text(
-            detail["title"] as? String ?: "",
+            title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            detail["publishTimeText"] as? String ?: "",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            detail["contentHTML"] as? String ?: (detail["content"] as? String ?: "暂无内容"),
-            style = MaterialTheme.typography.bodyMedium
+        Spacer(Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (createUser.isNotEmpty()) {
+                Text(
+                    createUser,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(
+                publishTime,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        Spacer(Modifier.height(12.dp))
+
+        com.example.tongji.ui.components.HtmlContent(
+            html = contentHtml,
+            baseUrl = "https://1.tongji.edu.cn/",
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

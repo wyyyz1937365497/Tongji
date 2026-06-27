@@ -99,7 +99,8 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = Screen.Schedule.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(Screen.Schedule.route) {
                 CourseScreen(onNavigateToExams = { navController.navigate(Screen.Exams.route) })

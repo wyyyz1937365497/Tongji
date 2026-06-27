@@ -6,8 +6,9 @@ import retrofit2.http.*
 interface StarApi {
     @GET("/api/app-api/activity/index/list")
     suspend fun getActivityList(
-        @Query("page") page: Int = 1,
-        @Query("size") size: Int = 20
+        @Query("pageNo") pageNo: Int = 1,
+        @Query("pageSize") pageSize: Int = 10,
+        @Query("recommend") recommend: Int = 1
     ): Response<Map<String, Any>>
 
     @GET("/api/app-api/activity/statistics/start-count")

@@ -1,7 +1,7 @@
 package com.example.tongji.ui.screens.schedule
 
-import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.view.LayoutInflater
+import android.widget.FrameLayout
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,18 +13,26 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.tongji.R
 import com.example.tongji.TongjiApp
 import com.example.tongji.data.local.entity.CourseScheduleEntity
 import com.example.tongji.data.local.entity.ExamScheduleItemEntity
+import com.example.tongji.ui.screens.schedule.calendarview.CalendarThemeApplier
 import com.haibin.calendarview.Calendar
+import com.haibin.calendarview.CalendarLayout
 import com.haibin.calendarview.CalendarView
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,11 +40,24 @@ import kotlin.math.abs
 fun CourseScreen(onNavigateToExams: () -> Unit) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
+    val colorScheme = MaterialTheme.colorScheme
     var schedules by remember { mutableStateOf<List<CourseScheduleEntity>>(emptyList()) }
     var examsThisWeek by remember { mutableStateOf<List<ExamScheduleItemEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
-    var selectedDate by remember { mutableStateOf("") }
-    var calendarViewRef by remember { mutableStateOf<CalendarView?>(null) }
+
+    val todayStr = remember {
+        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    }
+    val selectedDateState = remember { mutableStateOf(todayStr) }
+    val daySchedulesState = remember { mutableStateOf<List<CourseScheduleEntity>>(emptyList()) }
+
+    val schemeColorArgb = remember(colorScheme) { colorScheme.primary.toArgb() }
+
+    LaunchedEffect(selectedDateState.value, schedules) {
+        daySchedulesState.value = schedules
+            .filter { it.date == selectedDateState.value }
+            .sortedBy { it.startPeriod }
+    }
 
     fun load() {
         scope.launch {
@@ -45,10 +66,6 @@ fun CourseScreen(onNavigateToExams: () -> Unit) {
             schedules = app.courseRepository.getAllSchedules()
             examsThisWeek = app.academicRepository.getScheduledExams()
             isLoading = false
-            calendarViewRef?.let { cv ->
-                val map = buildSchemeMap(schedules)
-                cv.setSchemeDate(map)
-            }
         }
     }
 
@@ -75,135 +92,166 @@ fun CourseScreen(onNavigateToExams: () -> Unit) {
                 CircularProgressIndicator()
             }
         } else {
-            Column(Modifier.fillMaxSize().padding(padding)) {
-                CalendarViewContainer(
-                    schedules = schedules,
-                    onDateSelected = { year, month, day ->
-                        selectedDate = String.format("%04d-%02d-%02d", year, month, day)
-                    },
-                    onViewCreated = { cv ->
-                        calendarViewRef = cv
-                        if (schedules.isNotEmpty()) {
-                            val map = buildSchemeMap(schedules)
-                            cv.setSchemeDate(map)
-                        }
-                    }
-                )
+            CourseCalendarWithContent(
+                schedules = schedules,
+                examsThisWeek = examsThisWeek,
+                colorScheme = colorScheme,
+                selectedDateState = selectedDateState,
+                daySchedulesState = daySchedulesState,
+                onNavigateToExams = onNavigateToExams,
+                modifier = Modifier.fillMaxSize().padding(padding)
+            )
+        }
+    }
+}
 
-                val thisWeekExams = examsThisWeek.filter {
-                    it.examDateText?.let { date -> true } ?: false
-                }
-                if (thisWeekExams.isNotEmpty()) {
-                    ExamBanner(thisWeekExams, onNavigateToExams)
-                }
+@Composable
+private fun CourseCalendarWithContent(
+    schedules: List<CourseScheduleEntity>,
+    examsThisWeek: List<ExamScheduleItemEntity>,
+    colorScheme: ColorScheme,
+    selectedDateState: MutableState<String>,
+    daySchedulesState: MutableState<List<CourseScheduleEntity>>,
+    onNavigateToExams: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val schemeColorArgb = colorScheme.primary.toArgb()
+    AndroidView(
+        factory = { context ->
+            val root = LayoutInflater.from(context)
+                .inflate(R.layout.view_course_calendar, null) as CalendarLayout
+            val calendarView = root.findViewById<CalendarView>(R.id.course_calendar_view)
+            val contentView = root.findViewById<FrameLayout>(R.id.course_content_view)
 
-                val daySchedules = if (selectedDate.isNotEmpty()) {
-                    schedules.filter { it.date == selectedDate }.sortedBy { it.startPeriod }
-                } else {
-                    emptyList()
-                }
+            calendarView.setMonthView(
+                com.example.tongji.ui.screens.schedule.calendarview.CourseMonthView::class.java
+            )
+            calendarView.setWeekView(
+                com.example.tongji.ui.screens.schedule.calendarview.CourseWeekView::class.java
+            )
+            CalendarThemeApplier.apply(calendarView, colorScheme)
 
-                if (selectedDate.isNotEmpty()) {
-                    Text(
-                        "$selectedDate 课程",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            calendarView.setOnCalendarSelectListener(object : CalendarView.OnCalendarSelectListener {
+                override fun onCalendarSelect(calendar: Calendar, isClick: Boolean) {
+                    selectedDateState.value = String.format(
+                        "%04d-%02d-%02d", calendar.year, calendar.month, calendar.day
                     )
                 }
+                override fun onCalendarOutOfRange(calendar: Calendar?) {}
+            })
 
-                if (daySchedules.isEmpty() && selectedDate.isNotEmpty()) {
-                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text("当天无课程", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            calendarView.setSchemeDate(buildSchemeMap(schedules, schemeColorArgb))
+
+            val composeView = ComposeView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                setContent {
+                    MaterialTheme(colorScheme = colorScheme) {
+                        val courses by daySchedulesState
+                        val selectedDate by selectedDateState
+                        CourseDetailPane(
+                            courses = courses,
+                            selectedDate = selectedDate,
+                            examsThisWeek = examsThisWeek,
+                            onNavigateToExams = onNavigateToExams
+                        )
                     }
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(daySchedules) { course ->
-                            CourseCard(course)
-                        }
-                    }
+                }
+            }
+            contentView.addView(composeView)
+            root
+        },
+        update = { root ->
+            val calendarView = root.findViewById<CalendarView>(R.id.course_calendar_view)
+            calendarView.setSchemeDate(buildSchemeMap(schedules, schemeColorArgb))
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun CourseDetailPane(
+    courses: List<CourseScheduleEntity>,
+    selectedDate: String,
+    examsThisWeek: List<ExamScheduleItemEntity>,
+    onNavigateToExams: () -> Unit
+) {
+    Column(Modifier.fillMaxSize()) {
+        if (examsThisWeek.isNotEmpty()) {
+            ExamBanner(examsThisWeek, onNavigateToExams)
+        }
+
+        Text(
+            text = if (selectedDate.isNotEmpty()) "$selectedDate · ${courses.size} 节课" else "请选择日期",
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        if (courses.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "当天无课程",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(courses) { course ->
+                    CourseCard(course)
                 }
             }
         }
     }
 }
 
-private fun buildSchemeMap(schedules: List<CourseScheduleEntity>): Map<String, Calendar> {
+private fun buildSchemeMap(
+    schedules: List<CourseScheduleEntity>,
+    schemeColor: Int
+): Map<String, Calendar> {
     val map = mutableMapOf<String, Calendar>()
-    val uniqueDates = schedules.mapNotNull { it.date }.distinct()
-    for (dateStr in uniqueDates) {
+    for (dateStr in schedules.mapNotNull { it.date }.distinct()) {
         val parts = dateStr.split("-")
-        if (parts.size == 3) {
-            val year = parts[0].toIntOrNull() ?: continue
-            val month = parts[1].toIntOrNull() ?: continue
-            val day = parts[2].toIntOrNull() ?: continue
-            val calendar = Calendar().apply {
-                this.year = year
-                this.month = month
-                this.day = day
-                this.schemeColor = 0xFF2196F3.toInt()
-            }
-            map[calendar.toString()] = calendar
+        if (parts.size != 3) continue
+        val year = parts[0].toIntOrNull() ?: continue
+        val month = parts[1].toIntOrNull() ?: continue
+        val day = parts[2].toIntOrNull() ?: continue
+        val calendar = Calendar().apply {
+            this.year = year
+            this.month = month
+            this.day = day
+            this.schemeColor = schemeColor
         }
+        map[calendar.toString()] = calendar
     }
     return map
 }
 
 @Composable
-private fun CalendarViewContainer(
-    schedules: List<CourseScheduleEntity>,
-    onDateSelected: (Int, Int, Int) -> Unit,
-    onViewCreated: (CalendarView) -> Unit
-) {
-    AndroidView(
-        factory = { context ->
-            val layout = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
-            val calendarView = CalendarView(context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                setMonthView(com.example.tongji.ui.screens.schedule.calendarview.CourseMonthView::class.java)
-                setWeekView(com.example.tongji.ui.screens.schedule.calendarview.CourseWeekView::class.java)
-                setOnCalendarSelectListener(object : CalendarView.OnCalendarSelectListener {
-                    override fun onCalendarSelect(calendar: Calendar, isClick: Boolean) {
-                        onDateSelected(calendar.year, calendar.month, calendar.day)
-                    }
-                    override fun onCalendarOutOfRange(calendar: Calendar?) {}
-                })
-            }
-            layout.addView(calendarView)
-            onViewCreated(calendarView)
-            layout
-        },
-        update = { layout ->
-            val calendarView = layout.getChildAt(0) as? CalendarView
-            calendarView?.let { cv ->
-                val map = buildSchemeMap(schedules)
-                cv.setSchemeDate(map)
-            }
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
 private fun CourseCard(course: CourseScheduleEntity) {
-    val colors = listOf(
-        Color(0xFFE3F2FD), Color(0xFFFCE4EC), Color(0xFFE8F5E9),
-        Color(0xFFFFF3E0), Color(0xFFF3E5F5), Color(0xFFE0F7FA),
-        Color(0xFFFFF8E1), Color(0xFFF1F8E9), Color(0xFFFBE9E7)
+    val containerColors = remember {
+        listOf(
+            0xFFE3F2FD.toInt(), 0xFFFCE4EC.toInt(), 0xFFE8F5E9.toInt(),
+            0xFFFFF3E0.toInt(), 0xFFF3E5F5.toInt(), 0xFFE0F7FA.toInt(),
+            0xFFFFF8E1.toInt(), 0xFFF1F8E9.toInt(), 0xFFFBE9E7.toInt()
+        )
+    }
+    val color = androidx.compose.ui.graphics.Color(
+        containerColors[abs(course.courseName.hashCode()) % containerColors.size]
     )
-    val color = colors[abs(course.courseName.hashCode()) % colors.size]
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -211,15 +259,11 @@ private fun CourseCard(course: CourseScheduleEntity) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(Modifier.padding(12.dp)) {
-            Text(
-                course.courseName,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
-            )
+            Text(course.courseName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "${course.startPeriod}-${course.endPeriod}节",
+                    "第${course.startPeriod}-${course.endPeriod}节",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -251,9 +295,7 @@ private fun ExamBanner(exams: List<ExamScheduleItemEntity>, onClick: () -> Unit)
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        )
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -261,10 +303,7 @@ private fun ExamBanner(exams: List<ExamScheduleItemEntity>, onClick: () -> Unit)
         ) {
             Text("📝", fontSize = 20.sp)
             Spacer(Modifier.width(8.dp))
-            Text(
-                "本周考试：${exams.size} 门",
-                fontWeight = FontWeight.Medium
-            )
+            Text("本周考试：${exams.size} 门", fontWeight = FontWeight.Medium)
         }
     }
 }

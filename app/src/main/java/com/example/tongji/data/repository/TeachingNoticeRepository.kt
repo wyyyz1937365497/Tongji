@@ -34,15 +34,17 @@ class TeachingNoticeRepository(
     suspend fun getAll(): List<TeachingNoticeEntity> = dao.getAll()
 
     suspend fun getDetail(id: String): Map<String, Any>? {
-        val resp = api.findCommonMsgPublishById(id)
-        return if (resp.isSuccessful) resp.body() else null
+        val resp = api.findCommonMsgPublishById(id, System.currentTimeMillis())
+        if (!resp.isSuccessful) return null
+        val body = resp.body() ?: return null
+        return body["data"] as? Map<String, Any>
     }
 
     suspend fun markAsRead(id: String) = dao.markAsRead(id)
 
     private fun parseNotice(item: Map<String, Any>): TeachingNoticeEntity {
         return TeachingNoticeEntity(
-            id = (item["id"] as? Number)?.toString() ?: (item["id"] as? String ?: ""),
+            id = (item["id"] as? Number)?.toInt()?.toString() ?: (item["id"] as? String ?: ""),
             title = item["title"] as? String ?: "",
             publishTimeText = item["publishTime"] as? String ?: "",
             topStatus = (item["topStatus"] as? Number)?.toInt() ?: 0
