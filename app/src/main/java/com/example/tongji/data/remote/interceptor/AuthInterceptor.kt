@@ -23,9 +23,14 @@ class AuthInterceptor(
                     val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
                     builder.header("Cookie", cookieStr)
                 }
-                val uid = credentialStore.getString(CredentialStore.KEY_UID)
-                if (uid != null) {
-                    builder.header("X-Token", uid)
+                val sessionId = credentialStore.getString(CredentialStore.KEY_SESSION_ID)
+                if (sessionId != null) {
+                    builder.header("X-Token", sessionId)
+                } else {
+                    val uid = credentialStore.getString(CredentialStore.KEY_UID)
+                    if (uid != null) {
+                        builder.header("X-Token", uid)
+                    }
                 }
             }
             host.contains("star.tongji.edu.cn") -> {

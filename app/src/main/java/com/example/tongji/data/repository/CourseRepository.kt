@@ -1,18 +1,38 @@
 package com.example.tongji.data.repository
 
+import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.local.dao.CourseScheduleDao
 import com.example.tongji.data.local.entity.CourseScheduleEntity
 import com.example.tongji.data.remote.api.TongjiApi
+import com.example.tongji.util.StudentCodeCipher
 
 class CourseRepository(
     private val api: TongjiApi,
-    private val dao: CourseScheduleDao
+    private val dao: CourseScheduleDao,
+    private val credentialStore: CredentialStore
 ) {
     suspend fun sync(): Result<Unit> = runCatching {
-        val response = api.findStudentTimetab()
+        val timestamp = System.currentTimeMillis()
+        val calendarResp = api.getCurrentTermCalendar(timestamp)
+        val calendarBody = calendarResp.body() ?: return@runCatching
+        val calendarData = calendarBody["data"] as? Map<String, Any> ?: return@runCatching
+        val schoolCalendar = calendarData["schoolCalendar"] as? Map<String, Any> ?: return@runCatching
+        val calendarId = (schoolCalendar["id"] as? Number)?.toInt()?.toString() ?: return@runCatching
+
+        val uid = credentialStore.getString(CredentialStore.KEY_UID) ?: return@runCatching
+        val aesKey = credentialStore.getString(CredentialStore.KEY_AES_KEY)
+        val aesIv = credentialStore.getString(CredentialStore.KEY_AES_IV)
+        val studentCode = if (aesKey != null && aesIv != null) {
+            StudentCodeCipher.encryptStudentCode(uid, aesKey, aesIv)
+        } else {
+            return@runCatching
+        }
+
+        val response = api.findStudentTimetab(calendarId, studentCode, System.currentTimeMillis())
         if (response.isSuccessful) {
             val body = response.body() ?: return@runCatching
-            val list = body["list"] as? List<Map<String, Any>> ?: return@runCatching
+            val data = body["data"] as? Map<String, Any> ?: return@runCatching
+            val list = data["list"] as? List<Map<String, Any>> ?: return@runCatching
             val schedules = parseSchedules(list)
             dao.deleteAll()
             dao.insertAll(schedules)

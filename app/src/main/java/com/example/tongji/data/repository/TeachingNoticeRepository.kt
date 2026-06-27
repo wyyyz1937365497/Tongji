@@ -13,13 +13,18 @@ class TeachingNoticeRepository(
         val allNotices = mutableListOf<TeachingNoticeEntity>()
         while (true) {
             val resp = api.findMyCommonMsgPublish(mapOf(
-                "page" to page,
-                "pageSize" to 50
+                "total" to 0,
+                "pageNum_" to page,
+                "pageSize_" to 50
             ))
             val body = resp.body() ?: break
-            val list = body["list"] as? List<Map<String, Any>> ?: break
+            val data = body["data"] as? Map<String, Any> ?: break
+            val list = data["list"] as? List<Map<String, Any>> ?: break
             if (list.isEmpty()) break
             allNotices.addAll(list.map { parseNotice(it) })
+            val total = (data["total_"] as? Number)?.toInt() ?: list.size
+            val pageSize = (data["pageSize_"] as? Number)?.toInt() ?: 50
+            if (page * pageSize >= total) break
             page++
         }
         dao.deleteAll()
@@ -39,7 +44,7 @@ class TeachingNoticeRepository(
         return TeachingNoticeEntity(
             id = (item["id"] as? Number)?.toString() ?: (item["id"] as? String ?: ""),
             title = item["title"] as? String ?: "",
-            publishTimeText = item["publishTimeText"] as? String ?: "",
+            publishTimeText = item["publishTime"] as? String ?: "",
             topStatus = (item["topStatus"] as? Number)?.toInt() ?: 0
         )
     }

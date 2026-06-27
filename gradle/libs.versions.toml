@@ -1,14 +1,14 @@
 [versions]
-agp = "8.5.0"
+agp = "9.1.0" # 升级到 AGP 9.x
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
-kotlin = "2.0.0"
+kotlin = "2.2.10"
 composeBom = "2024.06.00"
-room = "2.6.1"
+room = "2.8.4"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 navigationCompose = "2.7.7"
@@ -16,7 +16,7 @@ datastorePreferences = "1.1.1"
 securityCrypto = "1.1.0-alpha06"
 coroutines = "1.8.1"
 gson = "2.11.0"
-ksp = "2.0.0-1.0.21"
+ksp = "2.3.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,4 +53,3 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-

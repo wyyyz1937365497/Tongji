@@ -12,22 +12,22 @@ interface TongjiApi {
     suspend fun getSessionUser(): Response<Map<String, Any>>
 
     @POST("/api/electionservice/underGraduateExamSwitch/getExamCalendar")
-    suspend fun getExamCalendar(@Body body: Map<String, @JvmSuppressWildcards Any> = emptyMap()): Response<Map<String, Any>>
+    suspend fun getExamCalendar(@Body body: okhttp3.RequestBody): Response<Map<String, Any>>
 
     @POST("/api/electionservice/undergraduateExamQuery/getStudentListPage")
     suspend fun getExamListPage(@Body body: Map<String, @JvmSuppressWildcards Any>): Response<Map<String, Any>>
 
     @GET("/api/scoremanagementservice/studentScoreBk/queryCourseTag")
-    suspend fun queryCourseTag(): Response<List<Map<String, Any>>>
+    suspend fun queryCourseTag(@Query("studentId") studentId: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 
     @GET("/api/scoremanagementservice/scoreGrades/getMyGrades")
-    suspend fun getMyGrades(): Response<Map<String, Any>>
+    suspend fun getMyGrades(@Query("studentId") studentId: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 
     @GET("/api/electionservice/reportManagement/findStudentTimetab")
-    suspend fun findStudentTimetab(): Response<Map<String, Any>>
+    suspend fun findStudentTimetab(@Query("calendarId") calendarId: String, @Query("studentCode") studentCode: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 
     @GET("/api/baseresservice/schoolCalendar/currentTermCalendar")
-    suspend fun getCurrentTermCalendar(): Response<Map<String, Any>>
+    suspend fun getCurrentTermCalendar(@Query("_t") timestamp: Long): Response<Map<String, Any>>
 
     @POST("/api/commonservice/commonMsgPublish/findMyCommonMsgPublish")
     suspend fun findMyCommonMsgPublish(@Body body: Map<String, @JvmSuppressWildcards Any>): Response<Map<String, Any>>

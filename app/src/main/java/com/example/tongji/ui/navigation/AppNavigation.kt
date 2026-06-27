@@ -27,6 +27,7 @@ import com.example.tongji.ui.screens.card.CampusCardScreen
 import com.example.tongji.ui.screens.exams.ExamScheduleScreen
 import com.example.tongji.ui.screens.grades.GradeReportScreen
 import com.example.tongji.ui.screens.library.LibraryScreen
+import com.example.tongji.ui.screens.login.LoginScreen
 
 sealed class Screen(val route: String, val title: String) {
     data object Schedule : Screen("schedule", "日程")
@@ -38,6 +39,7 @@ sealed class Screen(val route: String, val title: String) {
     data object Exams : Screen("exams", "考试安排")
     data object Grades : Screen("grades", "课程成绩")
     data object Library : Screen("library", "图书馆座位")
+    data object Login : Screen("login", "登录")
 }
 
 data class BottomNavItem(
@@ -113,7 +115,10 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(onNavigateToLogin = { navController.navigate(Screen.Login.route) })
+            }
+            composable(Screen.Login.route) {
+                LoginScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Activities.route) {
                 ActivityListScreen(onBack = { navController.popBackStack() })
