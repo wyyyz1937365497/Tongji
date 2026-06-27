@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.tongji.TongjiApp
 import com.example.tongji.auth.CampusModel
 import com.example.tongji.auth.CredentialStore
+import com.example.tongji.state.TermInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +23,8 @@ fun SettingsScreen(onNavigateToLogin: () -> Unit = {}) {
     val app = TongjiApp.getInstance()
     val authState by CampusModel.authState.collectAsState()
     val userProfile by CampusModel.userProfile.collectAsState()
+    val termName = TermInfo.simpleName
+    val currentWeek = TermInfo.currentWeek
 
     Log.d("SettingsScreen", "authState=${authState.javaClass.simpleName}, isLoggedIn=${authState.isLoggedIn}")
 
@@ -51,6 +54,13 @@ fun SettingsScreen(onNavigateToLogin: () -> Unit = {}) {
                             profile.facultyName?.let { InfoRow("学院", it) }
                             profile.deptOrMajor?.let { InfoRow("专业", it) }
                             profile.grade?.let { InfoRow("年级", it) }
+                        }
+                        if (!termName.isNullOrEmpty()) {
+                            Spacer(Modifier.height(4.dp))
+                            InfoRow("学期", termName)
+                        }
+                        if (currentWeek != null) {
+                            InfoRow("周次", "第${currentWeek}周")
                         }
                         Spacer(Modifier.height(12.dp))
                         OutlinedButton(

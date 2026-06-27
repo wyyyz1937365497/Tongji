@@ -30,6 +30,7 @@ import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarLayout
 import com.haibin.calendarview.CalendarView
 import kotlinx.coroutines.launch
+import com.example.tongji.state.TermInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -75,11 +76,21 @@ fun CourseScreen(onNavigateToExams: () -> Unit) {
         isLoading = false
     }
 
+    val weekText = TermInfo.currentWeek?.let { "第${it}周" } ?: ""
+    val titleText = if (weekText.isNotEmpty()) "课程表 · $weekText" else "课程表"
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("课程表") },
+                title = { Text(titleText) },
                 actions = {
+                    if (schedules.isNotEmpty()) {
+                        com.example.tongji.ui.components.CalendarExportAction(
+                            onExport = { ctx ->
+                                com.example.tongji.util.CalendarExporter.exportCourses(ctx, schedules)
+                            }
+                        )
+                    }
                     IconButton(onClick = { load() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "刷新")
                     }

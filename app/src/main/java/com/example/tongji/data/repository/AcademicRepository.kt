@@ -7,8 +7,6 @@ import com.example.tongji.data.local.entity.ExamScheduleItemEntity
 import com.example.tongji.data.local.entity.GradeCourseRecordEntity
 import com.example.tongji.data.local.entity.GradeSummaryEntity
 import com.example.tongji.data.remote.api.TongjiApi
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 
 class AcademicRepository(
     private val api: TongjiApi,
@@ -18,11 +16,13 @@ class AcademicRepository(
 ) {
     suspend fun syncExams(): Result<Unit> = runCatching {
         api.switchAuthContext(mapOf("authId" to 9102))
-        val formBody = "1".toRequestBody("application/x-www-form-urlencoded".toMediaTypeOrNull())
-        val calendarResp = api.getExamCalendar(formBody)
-        val calendarBody = calendarResp.body() ?: return@runCatching
-        val calendarData = calendarBody["data"] as? Map<String, Any> ?: return@runCatching
-        val calendarId = (calendarData["calendarId"] as? Number)?.toInt() ?: return@runCatching
+        val calResp = api.getCurrentTermCalendar(System.currentTimeMillis())
+        val calBody = calResp.body() ?: return@runCatching
+        val calData = calBody["data"] as? Map<String, Any> ?: return@runCatching
+        val schoolCal = calData["schoolCalendar"] as? Map<String, Any> ?: return@runCatching
+        val calendarId = (schoolCal["id"] as? Number)?.toInt() ?: return@runCatching
+        val calendarName = (schoolCal["year"]?.toString() ?: "") + " " +
+            (if ((schoolCal["term"] as? Number)?.toInt() == 2) "第二学期" else "第一学期")
 
         var page = 1
         val allExams = mutableListOf<ExamScheduleItemEntity>()
@@ -45,7 +45,9 @@ class AcademicRepository(
             val pageWrapper = wrapper["data"] as? Map<String, Any> ?: break
             val list = pageWrapper["list"] as? List<Map<String, Any>> ?: break
             if (list.isEmpty()) break
-            allExams.addAll(list.map { parseExamItem(it, calendarId, switchRemark) })
+            allExams.addAll(list.mapIndexed { idx, item ->
+                parseExamItem(item, calendarId, calendarName, switchRemark, idx)
+            })
             val total = (pageWrapper["total_"] as? Number)?.toInt() ?: list.size
             val pageSize = (pageWrapper["pageSize_"] as? Number)?.toInt() ?: 20
             if (page * pageSize >= total) break
@@ -103,13 +105,24 @@ class AcademicRepository(
     suspend fun getTerms() = gradeDao.getTerms()
     suspend fun getCoursesForTerm(termCode: Int) = gradeDao.getCoursesForTerm(termCode)
 
-    private fun parseExamItem(item: Map<String, Any>, calendarId: Int, switchRemark: String): ExamScheduleItemEntity {
+    private fun parseExamItem(
+        item: Map<String, Any>,
+        calendarId: Int,
+        calendarName: String,
+        switchRemark: String,
+        sortIndex: Int
+    ): ExamScheduleItemEntity {
+        val sourceId = (item["id"] as? Number)?.toInt()
+            ?: (item["teachingClassId"] as? String)?.let {
+                try { it.toLong().toInt() } catch (_: Exception) { it.hashCode() }
+            }
+            ?: "${item["newCourseCode"]}${item["newTeachingClassCode"]}".hashCode()
         return ExamScheduleItemEntity(
-            sourceId = (item["id"] as? Number)?.toInt() ?: 0,
+            sourceId = sourceId,
             calendarId = calendarId,
-            calendarName = "",
+            calendarName = (item["calendarIdI18n"] as? String) ?: calendarName,
             switchRemark = switchRemark,
-            sortIndex = (item["sortIndex"] as? Number)?.toInt() ?: 0,
+            sortIndex = sortIndex,
             courseName = item["courseName"] as? String ?: "",
             newCourseCode = item["newCourseCode"] as? String ?: "",
             newTeachingClassCode = item["newTeachingClassCode"] as? String ?: "",
@@ -126,7 +139,7 @@ class AcademicRepository(
 
     private fun parseGradeCourse(item: Map<String, Any>, termCode: Int, termName: String, calName: String, termAvg: String): GradeCourseRecordEntity {
         return GradeCourseRecordEntity(
-            sourceId = (item["id"] as? Number)?.toInt() ?: 0,
+            sourceId = (item["id"] as? Number)?.toLong()?.hashCode() ?: 0,
             termCode = termCode,
             termName = termName,
             calName = calName,

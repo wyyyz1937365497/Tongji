@@ -17,6 +17,13 @@ class AuthInterceptor(
         val builder = original.newBuilder()
 
         when {
+            host == "all.tongji.edu.cn" || host.endsWith(".all.tongji.edu.cn") -> {
+                val cookies = cookieJar.loadForRequest(original.url)
+                if (cookies.isNotEmpty()) {
+                    val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
+                    builder.header("Cookie", cookieStr)
+                }
+            }
             host.contains("1.tongji.edu.cn") || host.contains("tongji.edu.cn") -> {
                 val cookies = cookieJar.loadForRequest(original.url)
                 if (cookies.isNotEmpty()) {

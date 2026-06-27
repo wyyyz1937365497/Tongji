@@ -70,4 +70,13 @@ object NetworkModule {
             .build()
             .create(LibrarySpaceApi::class.java)
     }
+
+    fun createAllTongjiApi(context: Context): AllTongjiApi {
+        return Retrofit.Builder()
+            .baseUrl("https://all.tongji.edu.cn")
+            .client(createOkHttpClient(context))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AllTongjiApi::class.java)
+    }
 }

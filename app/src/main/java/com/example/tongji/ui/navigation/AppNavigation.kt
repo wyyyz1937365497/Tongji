@@ -22,12 +22,15 @@ import com.example.tongji.ui.screens.schedule.CourseScreen
 import com.example.tongji.ui.screens.campus.CampusHomeScreen
 import com.example.tongji.ui.screens.settings.SettingsScreen
 import com.example.tongji.ui.screens.activities.ActivityListScreen
+import com.example.tongji.TongjiApp
 import com.example.tongji.ui.screens.notices.TeachingNoticeScreen
 import com.example.tongji.ui.screens.card.CampusCardScreen
 import com.example.tongji.ui.screens.exams.ExamScheduleScreen
 import com.example.tongji.ui.screens.grades.GradeReportScreen
 import com.example.tongji.ui.screens.library.LibraryScreen
 import com.example.tongji.ui.screens.login.LoginScreen
+import com.example.tongji.state.TermInfo
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String, val title: String) {
     data object Schedule : Screen("schedule", "日程")
@@ -65,6 +68,11 @@ fun AppNavigation() {
         Screen.Campus.route,
         Screen.Settings.route
     )
+
+    val app = TongjiApp.getInstance()
+    LaunchedEffect(Unit) {
+        launch { app.courseRepository.refreshTermInfo() }
+    }
 
     Scaffold(
         bottomBar = {

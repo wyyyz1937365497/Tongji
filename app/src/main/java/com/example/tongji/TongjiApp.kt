@@ -35,12 +35,13 @@ class TongjiApp : Application() {
         val starApi = NetworkModule.createStarApi(this)
         val yikatongApi = NetworkModule.createYikatongApi(this)
         val librarySpaceApi = NetworkModule.createLibrarySpaceApi(this)
+        val allTongjiApi = NetworkModule.createAllTongjiApi(this)
 
         courseRepository = CourseRepository(tongjiApi, database.courseScheduleDao(), credentialStore)
         academicRepository = AcademicRepository(tongjiApi, database.examScheduleDao(), database.gradeDao(), credentialStore)
         activityRepository = ActivityRepository(starApi, database.campusActivityDao())
         teachingNoticeRepository = TeachingNoticeRepository(tongjiApi, database.teachingNoticeDao())
-        yikatongRepository = YikatongRepository(yikatongApi, database.campusCardDao())
+        yikatongRepository = YikatongRepository(yikatongApi, allTongjiApi, database.campusCardDao(), credentialStore)
         librarySpaceRepository = LibrarySpaceRepository(librarySpaceApi, database.librarySpaceDao())
         sessionRepository = SessionRepository(tongjiApi, credentialStore)
 

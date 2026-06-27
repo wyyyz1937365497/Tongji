@@ -1,30 +1,34 @@
 package com.example.tongji.data.repository
 
+import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.local.dao.CampusCardDao
 import com.example.tongji.data.local.entity.CampusCardBalanceEntity
 import com.example.tongji.data.local.entity.CampusCardTransactionEntity
+import com.example.tongji.data.remote.api.AllTongjiApi
 import com.example.tongji.data.remote.api.YikatongApi
 import java.text.SimpleDateFormat
 import java.util.*
 
 class YikatongRepository(
     private val api: YikatongApi,
-    private val dao: CampusCardDao
+    private val allTongjiApi: AllTongjiApi,
+    private val dao: CampusCardDao,
+    private val credentialStore: CredentialStore
 ) {
     suspend fun syncBalance(): Result<CampusCardBalanceEntity> = runCatching {
-        val resp = api.queryCard()
+        val uid = credentialStore.getString(CredentialStore.KEY_UID)
+            ?: throw Exception("未登录，无法获取余额")
+        val resp = allTongjiApi.getCardBalance(uid)
         val body = resp.body() ?: throw Exception("Empty response")
-        val data = body["data"] as? Map<String, Any>
-            ?: body["result"] as? Map<String, Any>
-            ?: body
+        val dataList = body["data"] as? List<Map<String, Any>>
+        val data = dataList?.firstOrNull() ?: throw Exception("No balance data")
 
         val balance = CampusCardBalanceEntity(
             capturedAt = System.currentTimeMillis(),
-            balanceYuan = (data["balance"] as? Number)?.toDouble()
-                ?: (data["dbal"] as? Number)?.toDouble() ?: 0.0,
-            account = data["account"] as? String ?: "",
-            ownerName = data["ownerName"] as? String ?: "",
-            cardIdentifier = data["cardIdentifier"] as? String ?: ""
+            balanceYuan = (data["balance"] as? Number)?.toDouble() ?: 0.0,
+            account = uid,
+            ownerName = "",
+            cardIdentifier = uid
         )
         dao.insertBalance(balance)
         balance

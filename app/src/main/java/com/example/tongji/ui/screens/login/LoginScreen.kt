@@ -23,12 +23,17 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "LoginScreen"
 private const val INITIAL_URL = "https://1.tongji.edu.cn"
+private const val ALL_TONGJI_SSO_URL = "https://all.tongji.edu.cn/new/index.html"
+
+private enum class LoginPhase {
+    IDLE, LOGGED_IN, SSO_DONE
+}
 
 private fun syncCookiesToJar(context: android.content.Context, url: String) {
     val cookieManager = CookieManager.getInstance()
     val cookieJar = CookieJar.getInstance(context)
     val cookieStr = cookieManager.getCookie(url) ?: return
-    Log.d(TAG, "同步 cookies: ${cookieStr.take(200)}")
+    Log.d(TAG, "同步 cookies for $url: ${cookieStr.take(200)}")
     try {
         val host = try { java.net.URL(url).host } catch (_: Exception) { return }
         val httpUrl = okhttp3.HttpUrl.Builder()
@@ -48,7 +53,7 @@ private fun syncCookiesToJar(context: android.content.Context, url: String) {
                     .build()
             }
         cookieJar.saveFromResponse(httpUrl, cookies)
-        Log.d(TAG, "cookies 已同步: ${cookies.size} 条")
+        Log.d(TAG, "cookies 已同步: ${cookies.size} 条 for $host")
     } catch (e: Exception) {
         Log.e(TAG, "同步 cookies 失败: ${e.message}", e)
     }
@@ -62,6 +67,7 @@ fun LoginScreen(onBack: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var currentUrl by remember { mutableStateOf(INITIAL_URL) }
     var webView by remember { mutableStateOf<WebView?>(null) }
+    var loginPhase by remember { mutableStateOf(LoginPhase.IDLE) }
 
     Scaffold(
         topBar = {
@@ -108,12 +114,25 @@ fun LoginScreen(onBack: () -> Unit) {
 
                             override fun onPageFinished(view: WebView, url: String) {
                                 super.onPageFinished(view, url)
-                                Log.d(TAG, "onPageFinished: url=$url")
+                                Log.d(TAG, "onPageFinished: url=$url phase=$loginPhase")
                                 currentUrl = url
                                 isLoading = false
 
                                 val host = try { java.net.URL(url).host } catch (_: Exception) { "" }
-                                Log.d(TAG, "host=$host")
+
+                                if (host == "all.tongji.edu.cn" && loginPhase == LoginPhase.LOGGED_IN) {
+                                    Log.d(TAG, "all.tongji.edu.cn 加载完成，同步 cookie")
+                                    loginPhase = LoginPhase.SSO_DONE
+                                    syncCookiesToJar(context, url)
+                                    webView?.destroy()
+                                    webView = null
+                                    onBack()
+                                    return@onPageFinished
+                                }
+
+                                if (loginPhase == LoginPhase.SSO_DONE) {
+                                    return@onPageFinished
+                                }
 
                                 if (host.contains("1.tongji.edu.cn") || host.contains("workbench.tongji.edu.cn")) {
                                     Log.d(TAG, "命中一系统域名，开始提取凭证")
@@ -137,14 +156,14 @@ fun LoginScreen(onBack: () -> Unit) {
                                             store.putString(CredentialStore.KEY_UID, urlUid)
                                             CampusModel.markValid()
                                             syncCookiesToJar(context, url)
+                                            loginPhase = LoginPhase.LOGGED_IN
+                                            Log.d(TAG, "导航到 all.tongji.edu.cn 获取 SSO cookie")
+                                            view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
                                                 try {
                                                     TongjiApp.getInstance().sessionRepository.refreshSessionUser()
                                                 } catch (_: Exception) { }
                                             }
-                                            webView?.destroy()
-                                            webView = null
-                                            onBack()
                                             return@onPageFinished
                                         } else if (!urlUid.isNullOrEmpty()) {
                                             Log.d(TAG, "URL uid 不是学号，跳过: $urlUid")
@@ -196,6 +215,9 @@ fun LoginScreen(onBack: () -> Unit) {
                                             sessionId?.let { store.putString(CredentialStore.KEY_SESSION_ID, it) }
                                             CampusModel.markValid()
                                             syncCookiesToJar(context, url)
+                                            loginPhase = LoginPhase.LOGGED_IN
+                                            Log.d(TAG, "导航到 all.tongji.edu.cn 获取 SSO cookie")
+                                            view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
                                                 try {
                                                     Log.d(TAG, "刷新 session...")
@@ -205,9 +227,6 @@ fun LoginScreen(onBack: () -> Unit) {
                                                     Log.e(TAG, "session 刷新失败: ${e.message}", e)
                                                 }
                                             }
-                                            webView?.destroy()
-                                            webView = null
-                                            onBack()
                                         } else {
                                             Log.d(TAG, "uid 为空，1.5秒后重试 (attempt=$attempt)")
                                             view.postDelayed({ tryExtractSessionData(view, url, attempt + 1) }, 1500)

@@ -1,5 +1,9 @@
 package com.example.tongji.ui.screens.grades
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,13 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tongji.TongjiApp
 import com.example.tongji.data.local.dao.TermInfo
 import com.example.tongji.data.local.entity.GradeCourseRecordEntity
 import com.example.tongji.data.local.entity.GradeSummaryEntity
+import com.example.tongji.state.TermInfo as GlobalTermInfo
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,8 +30,7 @@ fun GradeReportScreen(onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     var summary by remember { mutableStateOf<GradeSummaryEntity?>(null) }
     var terms by remember { mutableStateOf<List<TermInfo>>(emptyList()) }
-    var selectedTerm by remember { mutableIntStateOf(0) }
-    var courses by remember { mutableStateOf<List<GradeCourseRecordEntity>>(emptyList()) }
+    var allCourses by remember { mutableStateOf<List<GradeCourseRecordEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     fun load() {
@@ -36,23 +39,14 @@ fun GradeReportScreen(onBack: () -> Unit) {
             app.academicRepository.syncGrades()
             summary = app.academicRepository.getSummary()
             terms = app.academicRepository.getTerms()
-            if (terms.isNotEmpty() && selectedTerm == 0) {
-                selectedTerm = terms.first().termCode
-            }
-            if (selectedTerm != 0) {
-                courses = app.academicRepository.getCoursesForTerm(selectedTerm)
+            allCourses = terms.flatMap { term ->
+                app.academicRepository.getCoursesForTerm(term.termCode)
             }
             isLoading = false
         }
     }
 
     LaunchedEffect(Unit) { load() }
-
-    LaunchedEffect(selectedTerm) {
-        if (selectedTerm != 0) {
-            courses = app.academicRepository.getCoursesForTerm(selectedTerm)
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -87,16 +81,73 @@ fun GradeReportScreen(onBack: () -> Unit) {
             } else {
                 item { SummaryCard(summary) }
                 if (terms.isNotEmpty()) {
-                    item {
-                        TermSelector(
-                            terms = terms,
-                            selectedTermCode = selectedTerm,
-                            onTermSelected = { selectedTerm = it }
+                    items(terms, key = { it.termCode }) { term ->
+                        TermSection(
+                            term = term,
+                            courses = allCourses.filter { it.termCode == term.termCode }
                         )
                     }
                 }
-                items(courses, key = { it.sourceId }) { course ->
-                    GradeCourseCard(course)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TermSection(
+    term: TermInfo,
+    courses: List<GradeCourseRecordEntity>
+) {
+    val isCurrent = GlobalTermInfo.isCurrentTerm(term.termCode)
+    var expanded by remember(term.termCode) { mutableStateOf(isCurrent) }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        term.termName,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                    if (isCurrent) {
+                        Spacer(Modifier.width(8.dp))
+                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                            Text("当前", fontSize = 10.sp)
+                        }
+                    }
+                }
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expanded) "收起" else "展开",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                    if (courses.isEmpty()) {
+                        Text(
+                            "本学期暂无成绩记录",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    } else {
+                        courses.forEach { course ->
+                            GradeCourseCard(course)
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
                 }
             }
         }
@@ -136,46 +187,6 @@ private fun StatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TermSelector(
-    terms: List<TermInfo>,
-    selectedTermCode: Int,
-    onTermSelected: (Int) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedTerm = terms.find { it.termCode == selectedTermCode } ?: terms.first()
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-        OutlinedTextField(
-            value = selectedTerm.termName,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            terms.forEach { term ->
-                DropdownMenuItem(
-                    text = { Text(term.termName) },
-                    onClick = {
-                        onTermSelected(term.termCode)
-                        expanded = false
-                    }
-                )
-            }
-        }
     }
 }
 

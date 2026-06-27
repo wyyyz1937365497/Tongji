@@ -6,12 +6,26 @@ import com.example.tongji.data.local.dao.CourseScheduleDao
 import com.example.tongji.data.local.entity.CourseScheduleEntity
 import com.example.tongji.data.remote.api.TongjiApi
 import com.example.tongji.util.StudentCodeCipher
+import com.example.tongji.state.TermInfo as GlobalTermInfo
 
 class CourseRepository(
     private val api: TongjiApi,
     private val dao: CourseScheduleDao,
     private val credentialStore: CredentialStore
 ) {
+    suspend fun refreshTermInfo(): Result<Unit> = runCatching {
+        val timestamp = System.currentTimeMillis()
+        val calendarResp = api.getCurrentTermCalendar(timestamp)
+        val calendarBody = calendarResp.body() ?: return@runCatching
+        val calendarData = calendarBody["data"] as? Map<String, Any> ?: return@runCatching
+        val schoolCalendar = calendarData["schoolCalendar"] as? Map<String, Any> ?: return@runCatching
+        val simpleName = calendarData["simpleName"] as? String
+        val week = (calendarData["week"] as? Number)?.toInt()
+        val calId = (schoolCalendar["id"] as? Number)?.toInt()
+        val term = (schoolCalendar["term"] as? Number)?.toInt()
+        GlobalTermInfo.update(simpleName, week, calId, term)
+    }
+
     suspend fun sync(): Result<Unit> = runCatching {
         val timestamp = System.currentTimeMillis()
         val calendarResp = api.getCurrentTermCalendar(timestamp)
@@ -21,6 +35,11 @@ class CourseRepository(
         val calendarId = (schoolCalendar["id"] as? Number)?.toInt()?.toString() ?: return@runCatching
         val beginDay = (schoolCalendar["beginDay"] as? Number)?.toLong() ?: return@runCatching
         val weekBeginDay = (schoolCalendar["weekBenginDay"] as? Number)?.toInt() ?: 2
+
+        val simpleName = calendarData["simpleName"] as? String
+        val week = (calendarData["week"] as? Number)?.toInt()
+        val term = (schoolCalendar["term"] as? Number)?.toInt()
+        GlobalTermInfo.update(simpleName, week, calendarId.toIntOrNull(), term)
 
         credentialStore.putString("calendar_begin_day", beginDay.toString())
         credentialStore.putString("calendar_week_begin_day", weekBeginDay.toString())
