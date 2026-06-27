@@ -1,0 +1,46 @@
+package com.example.tongji.data.repository
+
+import com.example.tongji.data.local.dao.TeachingNoticeDao
+import com.example.tongji.data.local.entity.TeachingNoticeEntity
+import com.example.tongji.data.remote.api.TongjiApi
+
+class TeachingNoticeRepository(
+    private val api: TongjiApi,
+    private val dao: TeachingNoticeDao
+) {
+    suspend fun sync(): Result<Unit> = runCatching {
+        var page = 1
+        val allNotices = mutableListOf<TeachingNoticeEntity>()
+        while (true) {
+            val resp = api.findMyCommonMsgPublish(mapOf(
+                "page" to page,
+                "pageSize" to 50
+            ))
+            val body = resp.body() ?: break
+            val list = body["list"] as? List<Map<String, Any>> ?: break
+            if (list.isEmpty()) break
+            allNotices.addAll(list.map { parseNotice(it) })
+            page++
+        }
+        dao.deleteAll()
+        dao.insertAll(allNotices)
+    }
+
+    suspend fun getAll(): List<TeachingNoticeEntity> = dao.getAll()
+
+    suspend fun getDetail(id: String): Map<String, Any>? {
+        val resp = api.findCommonMsgPublishById(id)
+        return if (resp.isSuccessful) resp.body() else null
+    }
+
+    suspend fun markAsRead(id: String) = dao.markAsRead(id)
+
+    private fun parseNotice(item: Map<String, Any>): TeachingNoticeEntity {
+        return TeachingNoticeEntity(
+            id = (item["id"] as? Number)?.toString() ?: (item["id"] as? String ?: ""),
+            title = item["title"] as? String ?: "",
+            publishTimeText = item["publishTimeText"] as? String ?: "",
+            topStatus = (item["topStatus"] as? Number)?.toInt() ?: 0
+        )
+    }
+}

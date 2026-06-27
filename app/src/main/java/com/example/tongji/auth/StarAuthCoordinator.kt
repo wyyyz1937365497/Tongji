@@ -1,0 +1,43 @@
+package com.example.tongji.auth
+
+import android.content.Context
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+
+class StarAuthCoordinator(private val context: Context) {
+
+    private var webView: WebView? = null
+
+    suspend fun authenticate(): Result<String> = suspendCancellableCoroutine { continuation ->
+        val wv = WebView(context.applicationContext).apply {
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView, url: String) {
+                    if (url.contains("star.tongji.edu.cn")) {
+                        view.evaluateJavascript(
+                            "(function() { return localStorage.getItem('access_token') || ''; })();"
+                        ) { result ->
+                            val token = result.trim('"').replace("\\\"", "")
+                            if (token.isNotEmpty()) {
+                                val store = CredentialStore.getInstance(context)
+                                store.putString(CredentialStore.KEY_STAR_BEARER, token)
+                                continuation.resume(Result.success(token))
+                            }
+                        }
+                    }
+                }
+            }
+            loadUrl("https://star.tongji.edu.cn/app")
+        }
+        webView = wv
+        continuation.invokeOnCancellation { webView?.destroy() }
+    }
+
+    fun destroy() {
+        webView?.destroy()
+        webView = null
+    }
+}

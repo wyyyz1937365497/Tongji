@@ -1,0 +1,61 @@
+package com.example.tongji
+
+import android.app.Application
+import com.example.tongji.auth.CampusModel
+import com.example.tongji.auth.CredentialStore
+import com.example.tongji.data.local.AppDatabase
+import com.example.tongji.data.remote.NetworkModule
+import com.example.tongji.data.repository.*
+
+class TongjiApp : Application() {
+    lateinit var database: AppDatabase
+        private set
+    lateinit var courseRepository: CourseRepository
+        private set
+    lateinit var academicRepository: AcademicRepository
+        private set
+    lateinit var activityRepository: ActivityRepository
+        private set
+    lateinit var teachingNoticeRepository: TeachingNoticeRepository
+        private set
+    lateinit var yikatongRepository: YikatongRepository
+        private set
+    lateinit var librarySpaceRepository: LibrarySpaceRepository
+        private set
+    lateinit var sessionRepository: SessionRepository
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        instance = this
+        database = AppDatabase.getInstance(this)
+
+        val credentialStore = CredentialStore.getInstance(this)
+        val tongjiApi = NetworkModule.createTongjiApi(this)
+        val starApi = NetworkModule.createStarApi(this)
+        val yikatongApi = NetworkModule.createYikatongApi(this)
+        val librarySpaceApi = NetworkModule.createLibrarySpaceApi(this)
+
+        courseRepository = CourseRepository(tongjiApi, database.courseScheduleDao())
+        academicRepository = AcademicRepository(tongjiApi, database.examScheduleDao(), database.gradeDao())
+        activityRepository = ActivityRepository(starApi, database.campusActivityDao())
+        teachingNoticeRepository = TeachingNoticeRepository(tongjiApi, database.teachingNoticeDao())
+        yikatongRepository = YikatongRepository(yikatongApi, database.campusCardDao())
+        librarySpaceRepository = LibrarySpaceRepository(librarySpaceApi, database.librarySpaceDao())
+        sessionRepository = SessionRepository(tongjiApi, credentialStore)
+
+        val uid = credentialStore.getString(CredentialStore.KEY_UID)
+        if (uid != null) {
+            CampusModel.markValid()
+        }
+    }
+
+    companion object {
+        @Volatile
+        private var instance: TongjiApp? = null
+
+        fun getInstance(): TongjiApp {
+            return instance ?: throw IllegalStateException("TongjiApp not initialized")
+        }
+    }
+}
