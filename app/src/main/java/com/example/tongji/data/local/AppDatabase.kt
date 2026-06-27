@@ -21,7 +21,7 @@ import com.example.tongji.data.local.entity.*
         LibrarySpaceRoomEntity::class,
         TeachingNoticeEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

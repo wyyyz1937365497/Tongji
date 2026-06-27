@@ -16,5 +16,6 @@ data class CourseScheduleEntity(
     val weekNumber: Int,
     val weekText: String?,
     val semester: String,
+    val date: String?,
     val syncTime: Long = System.currentTimeMillis()
 )

@@ -1,3 +1,6 @@
 [submodule "Jinitaimei"]
 	path = Jinitaimei
 	url = https://github.com/Mike-Zhuang/Jinitaimei.git
+[submodule "CalendarView"]
+	path = CalendarView
+	url = https://github.com/huanghaibin-dev/CalendarView.git

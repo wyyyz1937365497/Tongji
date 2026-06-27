@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Tongji"
 include(":app")
+include(":calendarview")

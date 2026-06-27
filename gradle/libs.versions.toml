@@ -17,6 +17,7 @@ securityCrypto = "1.1.0-alpha06"
 coroutines = "1.8.1"
 gson = "2.11.0"
 ksp = "2.3.4"
+calendarview = "3.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+calendarview = { group = "com.haibin", name = "calendarview", version.ref = "calendarview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

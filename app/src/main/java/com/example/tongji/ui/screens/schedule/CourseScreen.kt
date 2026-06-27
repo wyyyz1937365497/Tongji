@@ -1,8 +1,11 @@
 package com.example.tongji.ui.screens.schedule
 
-import androidx.compose.foundation.*
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -12,13 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.tongji.TongjiApp
 import com.example.tongji.data.local.entity.CourseScheduleEntity
 import com.example.tongji.data.local.entity.ExamScheduleItemEntity
+import com.haibin.calendarview.Calendar
+import com.haibin.calendarview.CalendarView
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -27,10 +32,25 @@ import kotlin.math.abs
 fun CourseScreen(onNavigateToExams: () -> Unit) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
-    var currentWeek by remember { mutableIntStateOf(1) }
     var schedules by remember { mutableStateOf<List<CourseScheduleEntity>>(emptyList()) }
     var examsThisWeek by remember { mutableStateOf<List<ExamScheduleItemEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var selectedDate by remember { mutableStateOf("") }
+    var calendarViewRef by remember { mutableStateOf<CalendarView?>(null) }
+
+    fun load() {
+        scope.launch {
+            isLoading = true
+            app.courseRepository.sync()
+            schedules = app.courseRepository.getAllSchedules()
+            examsThisWeek = app.academicRepository.getScheduledExams()
+            isLoading = false
+            calendarViewRef?.let { cv ->
+                val map = buildSchemeMap(schedules)
+                cv.setSchemeDate(map)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         schedules = app.courseRepository.getAllSchedules()
@@ -43,71 +63,182 @@ fun CourseScreen(onNavigateToExams: () -> Unit) {
             TopAppBar(
                 title = { Text("课程表") },
                 actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            isLoading = true
-                            app.courseRepository.sync()
-                            schedules = app.courseRepository.getAllSchedules()
-                            isLoading = false
-                        }
-                    }) {
+                    IconButton(onClick = { load() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "刷新")
                     }
                 }
             )
         }
     ) { padding ->
-        if (isLoading) {
+        if (isLoading && schedules.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else {
             Column(Modifier.fillMaxSize().padding(padding)) {
-                WeekSelector(currentWeek, onWeekChange = { currentWeek = it })
-                val weekSchedules = schedules.filter { it.weekNumber == currentWeek }
+                CalendarViewContainer(
+                    schedules = schedules,
+                    onDateSelected = { year, month, day ->
+                        selectedDate = String.format("%04d-%02d-%02d", year, month, day)
+                    },
+                    onViewCreated = { cv ->
+                        calendarViewRef = cv
+                        if (schedules.isNotEmpty()) {
+                            val map = buildSchemeMap(schedules)
+                            cv.setSchemeDate(map)
+                        }
+                    }
+                )
 
                 val thisWeekExams = examsThisWeek.filter {
-                    it.examDateText?.let { date ->
-                        // Simple check - in a real app parse dates properly
-                        true
-                    } ?: false
+                    it.examDateText?.let { date -> true } ?: false
                 }
                 if (thisWeekExams.isNotEmpty()) {
                     ExamBanner(thisWeekExams, onNavigateToExams)
                 }
 
-                WeekGridView(
-                    schedules = weekSchedules,
-                    modifier = Modifier.fillMaxSize()
-                )
+                val daySchedules = if (selectedDate.isNotEmpty()) {
+                    schedules.filter { it.date == selectedDate }.sortedBy { it.startPeriod }
+                } else {
+                    emptyList()
+                }
+
+                if (selectedDate.isNotEmpty()) {
+                    Text(
+                        "$selectedDate 课程",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                if (daySchedules.isEmpty() && selectedDate.isNotEmpty()) {
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        Text("当天无课程", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(daySchedules) { course ->
+                            CourseCard(course)
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-@Composable
-private fun WeekSelector(currentWeek: Int, onWeekChange: (Int) -> Unit) {
-    Surface(
-        tonalElevation = 2.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = { if (currentWeek > 1) onWeekChange(currentWeek - 1) }) {
-                Text("< 上一周")
+private fun buildSchemeMap(schedules: List<CourseScheduleEntity>): Map<String, Calendar> {
+    val map = mutableMapOf<String, Calendar>()
+    val uniqueDates = schedules.mapNotNull { it.date }.distinct()
+    for (dateStr in uniqueDates) {
+        val parts = dateStr.split("-")
+        if (parts.size == 3) {
+            val year = parts[0].toIntOrNull() ?: continue
+            val month = parts[1].toIntOrNull() ?: continue
+            val day = parts[2].toIntOrNull() ?: continue
+            val calendar = Calendar().apply {
+                this.year = year
+                this.month = month
+                this.day = day
+                this.schemeColor = 0xFF2196F3.toInt()
             }
+            map[calendar.toString()] = calendar
+        }
+    }
+    return map
+}
+
+@Composable
+private fun CalendarViewContainer(
+    schedules: List<CourseScheduleEntity>,
+    onDateSelected: (Int, Int, Int) -> Unit,
+    onViewCreated: (CalendarView) -> Unit
+) {
+    AndroidView(
+        factory = { context ->
+            val layout = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            val calendarView = CalendarView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setMonthView(com.example.tongji.ui.screens.schedule.calendarview.CourseMonthView::class.java)
+                setWeekView(com.example.tongji.ui.screens.schedule.calendarview.CourseWeekView::class.java)
+                setOnCalendarSelectListener(object : CalendarView.OnCalendarSelectListener {
+                    override fun onCalendarSelect(calendar: Calendar, isClick: Boolean) {
+                        onDateSelected(calendar.year, calendar.month, calendar.day)
+                    }
+                    override fun onCalendarOutOfRange(calendar: Calendar?) {}
+                })
+            }
+            layout.addView(calendarView)
+            onViewCreated(calendarView)
+            layout
+        },
+        update = { layout ->
+            val calendarView = layout.getChildAt(0) as? CalendarView
+            calendarView?.let { cv ->
+                val map = buildSchemeMap(schedules)
+                cv.setSchemeDate(map)
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun CourseCard(course: CourseScheduleEntity) {
+    val colors = listOf(
+        Color(0xFFE3F2FD), Color(0xFFFCE4EC), Color(0xFFE8F5E9),
+        Color(0xFFFFF3E0), Color(0xFFF3E5F5), Color(0xFFE0F7FA),
+        Color(0xFFFFF8E1), Color(0xFFF1F8E9), Color(0xFFFBE9E7)
+    )
+    val color = colors[abs(course.courseName.hashCode()) % colors.size]
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = color),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
             Text(
-                "第 $currentWeek 周",
+                course.courseName,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 15.sp
             )
-            TextButton(onClick = { onWeekChange(currentWeek + 1) }) {
-                Text("下一周 >")
+            Spacer(Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "${course.startPeriod}-${course.endPeriod}节",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    course.location,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (course.teacher.isNotEmpty()) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    course.teacher,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -135,111 +266,5 @@ private fun ExamBanner(exams: List<ExamScheduleItemEntity>, onClick: () -> Unit)
                 fontWeight = FontWeight.Medium
             )
         }
-    }
-}
-
-@Composable
-private fun WeekGridView(
-    schedules: List<CourseScheduleEntity>,
-    modifier: Modifier = Modifier
-) {
-    val days = listOf("周一", "周二", "周三", "周四", "周五", "周六", "周日")
-    val periods = listOf(
-        "1\n08:00", "2\n08:50", "3\n10:00", "4\n10:45",
-        "5\n11:35", "6\n13:30", "7\n14:15", "8\n15:05",
-        "9\n15:50", "10\n18:00", "11\n18:45", "12\n19:35", "13\n20:10", "14\n20:55"
-    )
-
-    val scrollState = rememberScrollState()
-
-    Column(modifier.horizontalScroll(scrollState)) {
-        Row {
-            Cell(width = 60.dp, height = 48.dp) {
-                Text("节次", fontSize = 10.sp, textAlign = TextAlign.Center)
-            }
-            days.forEach { day ->
-                Cell(width = if (day == "周六" || day == "周日") 80.dp else 120.dp, height = 48.dp) {
-                    Text(day, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                }
-            }
-        }
-        periods.forEachIndexed { index, period ->
-            Row {
-                Cell(width = 60.dp, height = 52.dp) {
-                    Text(period, fontSize = 9.sp, textAlign = TextAlign.Center, lineHeight = 12.sp)
-                }
-                days.forEachIndexed { dayIdx, _ ->
-                    val courses = schedules.filter { it.dayOfWeek == dayIdx + 1 && it.startPeriod == index + 1 }
-                    val cellWidth = if (dayIdx >= 5) 80.dp else 120.dp
-                    if (courses.isNotEmpty()) {
-                        val course = courses.first()
-                        val span = (course.endPeriod - course.startPeriod + 1).coerceAtLeast(1)
-                        CourseCell(
-                            course = course,
-                            width = cellWidth,
-                            height = 52.dp * span
-                        )
-                    } else {
-                        Cell(width = cellWidth, height = 52.dp) {}
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CourseCell(course: CourseScheduleEntity, width: androidx.compose.ui.unit.Dp, height: androidx.compose.ui.unit.Dp) {
-    val colors = listOf(
-        Color(0xFFE3F2FD), Color(0xFFFCE4EC), Color(0xFFE8F5E9),
-        Color(0xFFFFF3E0), Color(0xFFF3E5F5), Color(0xFFE0F7FA),
-        Color(0xFFFFF8E1), Color(0xFFF1F8E9), Color(0xFFFBE9E7)
-    )
-    val color = colors[abs(course.courseName.hashCode()) % colors.size]
-
-    Surface(
-        modifier = Modifier.width(width).height(height),
-        color = color,
-        shape = RoundedCornerShape(4.dp),
-        tonalElevation = 1.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(2.dp).fillMaxSize(),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                course.courseName,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (course.location.isNotEmpty()) {
-                Text(
-                    course.location,
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun Cell(
-    width: androidx.compose.ui.unit.Dp,
-    height: androidx.compose.ui.unit.Dp,
-    content: @Composable () -> Unit = {}
-) {
-    Box(
-        modifier = Modifier
-            .width(width)
-            .height(height)
-            .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
     }
 }
