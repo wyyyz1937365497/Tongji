@@ -24,6 +24,8 @@ class TongjiApp : Application() {
         private set
     lateinit var sessionRepository: SessionRepository
         private set
+    lateinit var waterRepository: WaterRepository
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -36,6 +38,7 @@ class TongjiApp : Application() {
         val librarySpaceApi = NetworkModule.createLibrarySpaceApi(this)
         val allTongjiApi = NetworkModule.createAllTongjiApi(this)
         val yikatongApi = NetworkModule.createYikatongApi(this)
+        val waterApi = NetworkModule.createWaterApi(this)
 
         courseRepository = CourseRepository(tongjiApi, database.courseScheduleDao(), credentialStore)
         academicRepository = AcademicRepository(tongjiApi, database.examScheduleDao(), database.gradeDao(), credentialStore)
@@ -44,6 +47,7 @@ class TongjiApp : Application() {
         yikatongRepository = YikatongRepository(yikatongApi, database.campusCardDao(), credentialStore)
         librarySpaceRepository = LibrarySpaceRepository(librarySpaceApi, database.librarySpaceDao())
         sessionRepository = SessionRepository(tongjiApi, credentialStore)
+        waterRepository = WaterRepository(waterApi)
 
         val uid = credentialStore.getString(CredentialStore.KEY_UID)
         if (uid != null) {

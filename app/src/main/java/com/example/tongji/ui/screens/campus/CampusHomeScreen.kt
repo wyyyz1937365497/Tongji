@@ -33,7 +33,8 @@ fun CampusHomeScreen(
     onNavigateToCampusCard: () -> Unit,
     onNavigateToExams: () -> Unit,
     onNavigateToGrades: () -> Unit,
-    onNavigateToLibrary: () -> Unit
+    onNavigateToLibrary: () -> Unit,
+    onNavigateToWater: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val app = TongjiApp.getInstance()
@@ -45,7 +46,8 @@ fun CampusHomeScreen(
         CampusService("校园卡", Icons.Default.CreditCard, "余额与交易", onNavigateToCampusCard),
         CampusService("考试安排", Icons.Default.EditCalendar, "查看考试信息", onNavigateToExams),
         CampusService("课程成绩", Icons.Default.Grade, "GPA与成绩", onNavigateToGrades),
-        CampusService("图书馆座位", Icons.Default.MenuBook, "座位查询", onNavigateToLibrary)
+        CampusService("图书馆座位", Icons.Default.MenuBook, "座位查询", onNavigateToLibrary),
+        CampusService("智能控水", Icons.Default.WaterDrop, "浴室控水器状态", onNavigateToWater)
     )
 
     Scaffold(

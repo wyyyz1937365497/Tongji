@@ -1,6 +1,7 @@
 package com.example.tongji.auth
 
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient

@@ -31,6 +31,7 @@ import com.example.tongji.ui.screens.library.LibraryScreen
 import com.example.tongji.ui.screens.library.LibraryDetailScreen
 import com.example.tongji.ui.screens.library.SeatMapScreen
 import com.example.tongji.ui.screens.login.LoginScreen
+import com.example.tongji.ui.screens.water.WaterControlScreen
 import com.example.tongji.state.TermInfo
 import kotlinx.coroutines.launch
 
@@ -45,8 +46,9 @@ sealed class Screen(val route: String, val title: String) {
     data object Grades : Screen("grades", "课程成绩")
     data object Library : Screen("library", "图书馆座位")
     data object LibraryDetail : Screen("library_detail/{libraryId}/{libraryName}", "图书馆详情")
-    data object SeatMap : Screen("seat_map/{areaId}/{areaName}", "座位地图")
+    data object SeatMap : Screen("seat_map/{areaId}/{areaName}?labelId={labelId}", "座位地图")
     data object Login : Screen("login", "登录")
+    data object WaterControl : Screen("water_control", "智能控水")
 }
 
 data class BottomNavItem(
@@ -124,7 +126,8 @@ fun AppNavigation() {
                     onNavigateToCampusCard = { navController.navigate(Screen.CampusCard.route) },
                     onNavigateToExams = { navController.navigate(Screen.Exams.route) },
                     onNavigateToGrades = { navController.navigate(Screen.Grades.route) },
-                    onNavigateToLibrary = { navController.navigate(Screen.Library.route) }
+                    onNavigateToLibrary = { navController.navigate(Screen.Library.route) },
+                    onNavigateToWater = { navController.navigate(Screen.WaterControl.route) }
                 )
             }
             composable(Screen.Settings.route) {
@@ -132,6 +135,9 @@ fun AppNavigation() {
             }
             composable(Screen.Login.route) {
                 LoginScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.WaterControl.route) {
+                WaterControlScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Activities.route) {
                 ActivityListScreen(onBack = { navController.popBackStack() })
@@ -163,17 +169,29 @@ fun AppNavigation() {
                     libraryId = libraryId,
                     libraryName = libraryName,
                     onBack = { navController.popBackStack() },
-                    onNavigateToSeatMap = { areaId, areaName ->
-                        navController.navigate("seat_map/$areaId/${java.net.URLEncoder.encode(areaName, "UTF-8")}")
+                    onNavigateToSeatMap = { areaId, areaName, labelId ->
+                        val base = "seat_map/$areaId/${java.net.URLEncoder.encode(areaName, "UTF-8")}"
+                        val route = if (labelId != null) "$base?labelId=$labelId" else base
+                        navController.navigate(route)
                     }
                 )
             }
-            composable(Screen.SeatMap.route) { backStackEntry ->
+            composable(
+                route = Screen.SeatMap.route,
+                arguments = listOf(
+                    androidx.navigation.navArgument("labelId") {
+                        type = androidx.navigation.NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
                 val areaId = backStackEntry.arguments?.getString("areaId") ?: ""
                 val areaName = backStackEntry.arguments?.getString("areaName") ?: ""
+                val labelId = backStackEntry.arguments?.getString("labelId")?.takeIf { it.isNotEmpty() }
                 SeatMapScreen(
                     areaId = areaId,
                     areaName = areaName,
+                    labelId = labelId,
                     onBack = { navController.popBackStack() }
                 )
             }

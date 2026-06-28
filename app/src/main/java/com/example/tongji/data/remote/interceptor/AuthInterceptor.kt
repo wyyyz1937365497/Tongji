@@ -76,6 +76,15 @@ class AuthInterceptor(
                 builder.header("lang", "zh")
                 builder.header("X-Requested-With", "XMLHttpRequest")
             }
+            host == "ks.tongji.edu.cn" || host.endsWith(".ks.tongji.edu.cn") -> {
+                val cookies = cookieJar.loadForRequest(original.url)
+                if (cookies.isNotEmpty()) {
+                    val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
+                    builder.header("Cookie", cookieStr)
+                }
+                builder.header("Accept", "application/json, text/plain, */*")
+                builder.header("Referer", "https://ks.tongji.edu.cn/")
+            }
         }
 
         return chain.proceed(builder.build())

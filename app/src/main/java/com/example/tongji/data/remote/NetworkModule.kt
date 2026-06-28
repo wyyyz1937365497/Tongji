@@ -79,4 +79,13 @@ object NetworkModule {
             .build()
             .create(YikatongApi::class.java)
     }
+
+    fun createWaterApi(context: Context): WaterApi {
+        return Retrofit.Builder()
+            .baseUrl("https://ks.tongji.edu.cn")
+            .client(createOkHttpClient(context))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(WaterApi::class.java)
+    }
 }
