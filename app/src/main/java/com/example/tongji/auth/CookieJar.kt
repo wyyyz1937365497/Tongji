@@ -65,7 +65,7 @@ class CookieJar private constructor(context: Context) : OkHttpCookieJar {
         val domain = url.host
         val result = mutableListOf<Cookie>()
         result.addAll(cookieStore[domain] ?: emptyList())
-        if (domain != "1.tongji.edu.cn") {
+        if (domain == "all.tongji.edu.cn" || domain.endsWith(".all.tongji.edu.cn")) {
             result.addAll(cookieStore["1.tongji.edu.cn"] ?: emptyList())
         }
         return result.filter { it.expiresAt > System.currentTimeMillis() }
