@@ -3,7 +3,11 @@ package com.example.tongji.data.remote.interceptor
 import com.example.tongji.auth.CookieJar
 import com.example.tongji.auth.CredentialStore
 import okhttp3.Interceptor
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import okhttp3.Response
+import okio.Buffer
+import org.json.JSONObject
 
 class AuthInterceptor(
     private val cookieJar: CookieJar,
@@ -17,6 +21,13 @@ class AuthInterceptor(
         val builder = original.newBuilder()
 
         when {
+            host == "yikatong.tongji.edu.cn" || host.endsWith(".yikatong.tongji.edu.cn") -> {
+                val cookies = cookieJar.loadForRequest(original.url)
+                if (cookies.isNotEmpty()) {
+                    val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
+                    builder.header("Cookie", cookieStr)
+                }
+            }
             host == "all.tongji.edu.cn" || host.endsWith(".all.tongji.edu.cn") -> {
                 val cookies = cookieJar.loadForRequest(original.url)
                 if (cookies.isNotEmpty()) {
@@ -24,7 +35,7 @@ class AuthInterceptor(
                     builder.header("Cookie", cookieStr)
                 }
             }
-            host.contains("1.tongji.edu.cn") || host.contains("tongji.edu.cn") -> {
+            host.contains("1.tongji.edu.cn") -> {
                 val cookies = cookieJar.loadForRequest(original.url)
                 if (cookies.isNotEmpty()) {
                     val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
@@ -46,24 +57,45 @@ class AuthInterceptor(
                     builder.header("Authorization", "Bearer $token")
                 }
             }
-            host.contains("pay-yikatong") -> {
-                val token = credentialStore.getString(CredentialStore.KEY_YIKATONG_TOKEN)
-                if (token != null) {
-                    builder.header("synjones-auth", token)
-                }
-                val cookie = credentialStore.getString(CredentialStore.KEY_YIKATONG_COOKIE)
-                if (cookie != null) {
-                    builder.header("Cookie", cookie)
-                }
-            }
             host.contains("space.tongji.edu.cn") -> {
+                val cookies = cookieJar.loadForRequest(original.url)
+                if (cookies.isNotEmpty()) {
+                    val cookieStr = cookies.joinToString("; ") { "${it.name}=${it.value}" }
+                    builder.header("Cookie", cookieStr)
+                }
                 val jwt = credentialStore.getString(CredentialStore.KEY_LIBRARY_JWT)
                 if (jwt != null) {
-                    builder.header("Authorization", "Bearer $jwt")
+                    builder.header("Authorization", "bearer$jwt")
+                    original.body?.let { body ->
+                        val ct = body.contentType()
+                        if (ct != null && ct.subtype.contains("json")) {
+                            injectAuthIntoBody(builder, body, ct, jwt)
+                        }
+                    }
                 }
+                builder.header("lang", "zh")
+                builder.header("X-Requested-With", "XMLHttpRequest")
             }
         }
 
         return chain.proceed(builder.build())
+    }
+
+    private fun injectAuthIntoBody(
+        builder: okhttp3.Request.Builder,
+        body: okhttp3.RequestBody,
+        contentType: MediaType,
+        jwt: String
+    ) {
+        try {
+            val buffer = Buffer()
+            body.writeTo(buffer)
+            val bodyStr = buffer.readUtf8()
+            val json = if (bodyStr.isEmpty()) JSONObject() else JSONObject(bodyStr)
+            if (!json.has("authorization")) {
+                json.put("authorization", "bearer$jwt")
+                builder.method("POST", RequestBody.create(contentType, json.toString()))
+            }
+        } catch (_: Exception) { }
     }
 }

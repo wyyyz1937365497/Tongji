@@ -4,6 +4,9 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface LibrarySpaceApi {
+    @POST("/api/cas/user")
+    suspend fun casUser(@Body body: Map<String, @JvmSuppressWildcards String>): Response<Map<String, Any>>
+
     @POST("/reserve/index/quickSelect")
     suspend fun quickSelect(@Body body: Map<String, @JvmSuppressWildcards Any> = emptyMap()): Response<Map<String, Any>>
 
