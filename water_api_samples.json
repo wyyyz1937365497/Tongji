@@ -1,0 +1,1549 @@
+{
+  "extracted_at": "2026-06-29",
+  "source": "ProxyPin6-28_23_31_33.har",
+  "endpoints": [
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/waterapi/api/AccUseHzWatch?info=Wni6c60M3Arw0zFWh%2F1Js56b87dFULpmlNyQ04oSc9s%3D&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VySWQiOiJrc3dhdGVyIiwiUGFzc3dvcmQiOiJrdjdYalB6ckROSlkwcGRaIyIsImV4cCI6MTc4MjY2MjQ1NC4wfQ.twvOhT5E_6-OrY4Bpf54cfElCDxTfexJlzE2HdXypu0",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/order"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": {
+        "RetNo": 0,
+        "RetDsp": "操作成功 共 29 笔有效记录 ",
+        "List": [
+          {
+            "ClassNo": 712,
+            "ClassName": "西南一楼(浴室)801号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 713,
+            "ClassName": "西南一楼(浴室)802号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 714,
+            "ClassName": "西南一楼(浴室)803号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 715,
+            "ClassName": "西南一楼(浴室)804号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 716,
+            "ClassName": "西南一楼(浴室)805号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 717,
+            "ClassName": "西南一楼(浴室)806号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 718,
+            "ClassName": "西南一楼(浴室)807号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 719,
+            "ClassName": "西南一楼(浴室)808号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 720,
+            "ClassName": "西南一楼(浴室)809号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 721,
+            "ClassName": "西南一楼(浴室)810号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 722,
+            "ClassName": "西南一楼(浴室)811号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 723,
+            "ClassName": "西南一楼(浴室)812号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 724,
+            "ClassName": "西南一楼(浴室)813号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 725,
+            "ClassName": "西南一楼(浴室)814号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 726,
+            "ClassName": "西南一楼(浴室)815号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 727,
+            "ClassName": "西南一楼(浴室)816号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 728,
+            "ClassName": "西南一楼(浴室)817号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 729,
+            "ClassName": "西南一楼(浴室)818号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 730,
+            "ClassName": "西南一楼(浴室)819号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 731,
+            "ClassName": "西南一楼(浴室)820号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 732,
+            "ClassName": "西南一楼(浴室)821号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 733,
+            "ClassName": "西南一楼(浴室)822号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 734,
+            "ClassName": "西南一楼(浴室)823号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 735,
+            "ClassName": "西南一楼(浴室)824号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 736,
+            "ClassName": "西南一楼(浴室)825号控水器",
+            "PosNum": 3,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 737,
+            "ClassName": "西南一楼(浴室)826号控水器",
+            "PosNum": 1,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 738,
+            "ClassName": "西南一楼(浴室)827号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 739,
+            "ClassName": "西南一楼(浴室)828号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          },
+          {
+            "ClassNo": 740,
+            "ClassName": "西南一楼(浴室)829号控水器",
+            "PosNum": 4,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": ""
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/waterapi/api/GetToken?info=7v0%2BHHL5t4ppEYGL%2FqBDfo9PY9nXYAPTULeu8aLqyxnKDB6y8nl8L9gu1bDvQOfmN9ON3N7eU1pqOANcuRdJgsGg1qvmuWG4ArUy9VbnObs%3D",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/order"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": {
+        "RetNo": 0,
+        "RetDsp": "操作成功",
+        "Token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VySWQiOiJrc3dhdGVyIiwiUGFzc3dvcmQiOiJrdjdYalB6ckROSlkwcGRaIyIsImV4cCI6MTc4MjY2MjQ1NC4wfQ.twvOhT5E_6-OrY4Bpf54cfElCDxTfexJlzE2HdXypu0"
+      }
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/waterapi/api/UseHzWatch",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": {
+        "RetNo": 0,
+        "RetDsp": "操作成功",
+        "List": [
+          {
+            "ClassNo": 20,
+            "ClassName": "西南七楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 487,
+            "ClassName": "西南二楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 530,
+            "ClassName": "西南九楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 532,
+            "ClassName": "西南三楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 596,
+            "ClassName": "西南八楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 642,
+            "ClassName": "学三楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 676,
+            "ClassName": "学五楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 711,
+            "ClassName": "西南一楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 742,
+            "ClassName": "西北一楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 781,
+            "ClassName": "西北二楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 809,
+            "ClassName": "西北三楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 849,
+            "ClassName": "西北四楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 878,
+            "ClassName": "西北五楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 907,
+            "ClassName": "友园456浴室",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1008,
+            "ClassName": "友园6号楼淋浴房",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1054,
+            "ClassName": "沪北一号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1068,
+            "ClassName": "沪西3号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1084,
+            "ClassName": "沪西4号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1100,
+            "ClassName": "沪西11号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1127,
+            "ClassName": "友园16/17/18浴室",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1189,
+            "ClassName": "沪北二号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1216,
+            "ClassName": "沪北三号楼",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1248,
+            "ClassName": "友园17号楼浴室",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1249,
+            "ClassName": "友园18号楼浴室",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          },
+          {
+            "ClassNo": 1310,
+            "ClassName": "西南八楼(诚善开水)546号控水器(4层北开水房)",
+            "PosNum": 0,
+            "WarnPosNum": 0,
+            "UseFreeRate": 0,
+            "BookRate": 0,
+            "Actkind": 0,
+            "BookCode": null
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/logo.png",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRw"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/accountapi/berserker-base/user/Sso/SsoCheck",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": {
+        "Ret": "0",
+        "Msg": "成功",
+        "User": {
+          "Account": "454300",
+          "CLASS": "1",
+          "equipmentList": [],
+          "mercaccInfo": [],
+          "Name": "王尹囿",
+          "NAME": "王尹囿",
+          "ACCOUNT": "454300",
+          "Sno": "2552304",
+          "SNO": "2552304",
+          "sno": "2552304",
+          "accountList": [
+            "454300"
+          ],
+          "userAccount": "2552304",
+          "name": "王尹囿",
+          "userType": "user",
+          "yktSchoolCode": "",
+          "class": "1",
+          "account": "454300"
+        }
+      }
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-b609.25c4b082.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-b609\"],{5112:function(t,e,s){\"use strict\";s.r(e);var o=function(){var t=this,e=t.$createElement,o=t._self._c||e;return o(\"div\",[o(\"mt-header\",{attrs:{title:\"异常跟踪\"}},[o(\"router-link\",{attrs:{slot:\"left\",to:\"/mainm\"},slot:\"left\"},[o(\"mt-button\",{attrs:{icon:\"back\"}},[t._v(\"返回\")])],1)],1),t._l(t.poslist,function(e){return o(\"div\",{staticClass:\"mint-cell\"},[o(\"div\",{staticClass:\"mint-cell-wrapper\"},[o(\"img\",{attrs:{slot:\"icon\",src:s(\""
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-4d57.aadc5c2b.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-4d57\"],{\"17d2\":function(e,t,o){\"use strict\";o.r(t);var n=function(){var e=this,t=e.$createElement,n=e._self._c||t;return n(\"div\",[n(\"mt-header\",{attrs:{title:\"我的申请\"}},[n(\"router-link\",{attrs:{slot:\"left\",to:\"/\"},slot:\"left\"},[n(\"mt-button\",{attrs:{icon:\"back\"}},[e._v(\"返回\")])],1)],1),e._l(e.orders,function(t){return 0!=t.Actkind?n(\"div\",{staticClass:\"mint-cell\"},[n(\"div\",{staticClass:\"mint-cell-wrapper\"},[n(\"img\",{attrs:{slot:\"icon"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-6f9e.67926851.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "*/*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-6f9e\"],{\"18a7\":function(t,e,o){\"use strict\";o.r(e);var n=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n(\"div\",[n(\"mt-header\",{attrs:{title:\"申请预约\"}}),t._l(t.orders,function(e){return n(\"div\",{staticClass:\"mint-cell\"},[n(\"div\",{staticClass:\"mint-cell-wrapper\"},[n(\"img\",{attrs:{slot:\"icon\",src:o(\"f39e\"),width:\"40\",height:\"40\"},slot:\"icon\"}),n(\"div\",{staticClass:\"mint-cell-title\"},[n(\"span\",{staticClass:\"mint-cell-t"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-4ac8.b502b942.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "*/*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-4ac8\"],{\"00bb\":function(t,e,r){(function(e,n,i){t.exports=n(r(\"21bf\"),r(\"38ba\"))})(0,function(t){return t.mode.CFB=function(){var e=t.lib.BlockCipherMode.extend();function r(t,e,r,n){var i=this._iv;if(i){var o=i.slice(0);this._iv=void 0}else o=this._prevBlock;n.encryptBlock(o,0);for(var c=0;c<r;c++)t[e+c]^=o[c]}return e.Encryptor=e.extend({processBlock:function(t,e){var n=this._cipher,i=n.blockSize;r.call(this,t,e,i,n),this._prevB"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-469e.2de74b43.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-469e\"],{\"11f3\":function(t,e,o){\"use strict\";var n=o(\"9854\"),s=o.n(n);s.a},\"764f\":function(t,e,o){\"use strict\";o.r(e);var n=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n(\"div\",[n(\"mt-header\",{attrs:{title:t.title+\"\"}},[n(\"router-link\",{attrs:{slot:\"left\",to:\"/groupinfo\"},slot:\"left\"},[n(\"mt-button\",{attrs:{icon:\"back\"}},[t._v(\"返回\")])],1)],1),t._l(t.orders,function(e){return n(\"div\",{staticClass:\"mint-cell\"},[n(\""
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-eb7b.ced01ed7.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "*/*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-eb7b\"],{\"044b\":function(e,t){function n(e){return!!e.constructor&&\"function\"===typeof e.constructor.isBuffer&&e.constructor.isBuffer(e)}function r(e){return\"function\"===typeof e.readFloatLE&&\"function\"===typeof e.slice&&n(e.slice(0,0))}\n/*!\n * Determine if an object is a Buffer\n *\n * @author   Feross Aboukhadijeh <https://feross.org>\n * @license  MIT\n */\ne.exports=function(e){return null!=e&&(n(e)||r(e)||!!e._isBuffer)}},\"0a06\":fu"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-4595.92ba1191.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-4595\"],{\"4b36\":function(t,e,a){},c414:function(t,e,a){\"use strict\";var s=a(\"4b36\"),o=a.n(s);o.a},d44f:function(t,e,a){\"use strict\";a.r(e);var s=function(){var t=this,e=t.$createElement,a=t._self._c||e;return a(\"div\",{staticClass:\"page-navbar\"},[a(\"mt-navbar\",{staticClass:\"page-part\",model:{value:t.selected,callback:function(e){t.selected=e},expression:\"selected\"}},[a(\"mt-tab-item\",{attrs:{id:\"1\",\"aria-selected\":\"true\"}},[t._v(\"登陆\""
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-44ac.f75e0709.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-44ac\"],{3846:function(t,e,n){n(\"9e1e\")&&\"g\"!=/./g.flags&&n(\"86cc\").f(RegExp.prototype,\"flags\",{configurable:!0,get:n(\"0bfb\")})},\"4c89\":function(t,e,n){t.exports=n.p+\"img/button5.c8ef3ebd.png\"},\"6b54\":function(t,e,n){\"use strict\";n(\"3846\");var s=n(\"cb7c\"),o=n(\"0bfb\"),c=n(\"9e1e\"),a=\"toString\",i=/./[a],u=function(t){n(\"2aba\")(RegExp.prototype,a,t,!0)};n(\"79e5\")(function(){return\"/a/b\"!=i.call({source:\"a\",flags:\"b\"})})?u(function(){va"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-4188.72ebf83c.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-4188\"],{\"103e\":function(t,e,o){},\"10ea\":function(t,e,o){t.exports=o.p+\"img/suoding.77bfd5f5.png\"},\"5d79\":function(t,e){t.exports=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA4RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-215b.e64380b4.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-215b\"],{\"28a5\":function(t,e,n){n(\"214f\")(\"split\",2,function(t,e,i){\"use strict\";var s=n(\"aae3\"),a=i,c=[].push,o=\"split\",r=\"length\",l=\"lastIndex\";if(\"c\"==\"abbc\"[o](/(b)*/)[1]||4!=\"test\"[o](/(?:)/,-1)[r]||2!=\"ab\"[o](/(?:ab)*/)[r]||4!=\".\"[o](/(.?)(.?)/)[r]||\".\"[o](/()()/)[r]>1||\"\"[o](/.?/)[r]){var u=void 0===/()??/.exec(\"\")[1];i=function(t,e){var n=String(this);if(void 0===t&&0===e)return[];if(!s(t))return a.call(n,t,e);var i,o,g,d,f"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-14d8.76180afa.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-14d8\"],{1987:function(t,e,o){\"use strict\";o.r(e);var n=function(){var t=this,e=t.$createElement,o=t._self._c||e;return o(\"div\",{staticStyle:{\"background-color\":\"#efeff4\",height:\"100%\"}},[o(\"mt-header\",{attrs:{title:\"扫一扫使用\"}},[o(\"mt-button\",{attrs:{slot:\"left\",icon:\"back\"},on:{click:t.handleClose},slot:\"left\"},[t._v(\"返回\")])],1),o(\"div\",{staticClass:\"center\"},[o(\"div\",{staticClass:\"title\"}),o(\"div\",{staticClass:\"info\"},[this.start?o"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-134f.630df997.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-134f\"],{\"56c8\":function(t,e,a){\"use strict\";a.r(e);var s=function(){var t=this,e=t.$createElement,a=t._self._c||e;return a(\"div\",[a(\"mt-header\",{attrs:{title:\"消费记录查询\"}},[a(\"router-link\",{attrs:{slot:\"left\",to:\"/record\"},slot:\"left\"},[a(\"mt-button\",{attrs:{icon:\"back\"}},[t._v(\"返回\")])],1)],1),a(\"div\",{staticClass:\"page-field\"},[a(\"div\",{staticClass:\"page-title\"},[t._v(\"请输入开始日期和结束日期\")]),a(\"div\",{staticClass:\"page-part\"},[a(\"mt-field\""
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-b609.bfe7da5f.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".cell-label{margin-left:10px}.cell-label,.cell-label-m{color:#888;display:inline-block;font-size:12px;margin-right:3px;margin-top:0}.cell-label-code{//#888:inline-block;color:coral;font-size:14px;font-weight:700;margin-left:10px;margin-right:3px;margin-top:10px}.cell-label-green{color:green}.cell-label-green,.cell-label-red{display:inline-block;font-size:12px;margin-right:3px}.cell-label-red{color:red}.mint-cell-wrapper{padding:0}.mint-cell-title{font-size:16px;margin-top:10px}.mint-cell-text{ma"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-6f9e.23d1bdbf.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".cell-label{margin-left:10px}.cell-label,.cell-label-m{color:#888;display:inline-block;font-size:12px;margin-right:3px;margin-top:0}.cell-label-code{//#888:inline-block;color:coral;margin-top:10px}.cell-label-code,.cell-label-green{font-size:14px;font-weight:700;margin-left:5px}.cell-label-green{color:green;display:inline-block}.cell-label-red{color:red;display:inline-block;font-size:12px;margin-right:3px}.mint-cell-wrapper{padding:0}.mint-cell-title{font-size:16px;margin-top:10px}.mint-cell-tex"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-4d57.40b298f8.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".cell-label[data-v-2ff2bc57]{margin-left:10px}.cell-label-m[data-v-2ff2bc57],.cell-label[data-v-2ff2bc57]{color:#888;display:inline-block;font-size:12px;margin-right:3px;margin-top:0}.cell-label-code[data-v-2ff2bc57]{//#888:inline-block;color:coral;font-size:14px;font-weight:700;margin-left:10px;margin-right:3px;margin-top:10px}.cell-label-green[data-v-2ff2bc57]{color:green;display:inline-block;font-size:12px;margin-right:3px}.cell-label-red[data-v-2ff2bc57]{color:red;display:inline-block;font-s"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-469e.e5230976.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".cell-label{margin-left:10px}.cell-label,.cell-label-m{color:#888;display:inline-block;font-size:12px;margin-right:3px;margin-top:0}.cell-label-code{//#888:inline-block;color:coral;margin-top:10px}.cell-label-code,.cell-label-green{font-size:14px;font-weight:700;margin-left:5px}.cell-label-green{color:green;display:inline-block}.cell-label-red{color:red;display:inline-block;font-size:12px;margin-right:3px}.mint-cell-wrapper{padding:0}.mint-cell-title{font-size:16px;margin-top:10px}.mint-cell-tex"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-4595.a2f491d9.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".top[data-v-c9c429a4]{margin-top:10px}"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-14d8.4eecec5a.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".center[data-v-c7ae5dfe]{background-color:#fff;margin:0;padding:0}.title[data-v-c7ae5dfe]{font-size:large;line-height:60px;text-align:center}.info[data-v-c7ae5dfe]{color:#329ae2;line-height:50px;text-align:center}"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-44ac.836d6c3c.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".sudoku_row{flex-wrap:wrap;width:100%}.sudoku_item,.sudoku_row{align-items:center;display:flex}.sudoku_item{cursor:pointer;flex-direction:column;justify-content:center;padding-bottom:10px;padding-top:10px;width:33%}.opacity{background:#e5e5e5;opacity:.4}.sudoku_item img{display:block;margin-bottom:3px}.top[data-v-83ab986a]{//#104E8B:100% 100%;background-color:#104e8b;height:150px;width:100%}.topbutton1[data-v-83ab986a]{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAADUCAYAAABQ"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-4188.a82979e5.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".center[data-v-91f43f9e]{background-color:#fff;margin:0;padding:0}.title[data-v-91f43f9e]{font-size:large;line-height:60px;text-align:center}.info[data-v-91f43f9e]{color:#329ae2;line-height:50px;text-align:center}"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-215b.272b432c.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".mint-cell-wrapper{padding:0}.mint-cell-title{font-size:16px;margin-left:5px;margin-top:10px}.mint-cell-label{color:#888;display:block;font-size:12px;margin-bottom:10px;margin-right:3px;margin-top:10px}"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-134f.0cf71d00.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".page-title[data-v-63fbcfd3]{font-size:large;margin-bottom:20px;margin-left:10px;margin-top:20px}"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/chunk-vendors.515d4580.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "*/*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(window[\"webpackJsonp\"]=window[\"webpackJsonp\"]||[]).push([[\"chunk-vendors\"],{\"01f9\":function(t,e,n){\"use strict\";var i=n(\"2d00\"),r=n(\"5ca1\"),o=n(\"2aba\"),a=n(\"32e9\"),s=n(\"84f2\"),c=n(\"41a0\"),u=n(\"7f20\"),l=n(\"38fd\"),f=n(\"2b4c\")(\"iterator\"),d=!([].keys&&\"next\"in[].keys()),p=\"@@iterator\",h=\"keys\",v=\"values\",m=function(){return this};t.exports=function(t,e,n,g,y,b,_){c(n,e,g);var x,w,C,T=function(t){if(!d&&t in S)return S[t];switch(t){case h:return function(){return new n(this,t)};case v:return functi"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/js/app.a943c466.js",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "*/*"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "(function(e){function n(n){for(var r,o,a=n[0],i=n[1],h=n[2],l=0,s=[];l<a.length;l++)o=a[l],c[o]&&s.push(c[o][0]),c[o]=0;for(r in i)Object.prototype.hasOwnProperty.call(i,r)&&(e[r]=i[r]);f&&f(n);while(s.length)s.shift()();return u.push.apply(u,h||[]),t()}function t(){for(var e,n=0;n<u.length;n++){for(var t=u[n],r=!0,o=1;o<t.length;o++){var a=t[o];0!==c[a]&&(r=!1)}r&&(u.splice(n--,1),e=i(i.s=t[0]))}return e}var r={},o={app:0},c={app:0},u=[];function a(e){return i.p+\"js/\"+({}[e]||e)+\".\"+{\"chunk-134"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/chunk-vendors.baeab9bc.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/css,*/*;q=0.1"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": ".mint-header{-ms-flex-align:center;-webkit-box-align:center;align-items:center;background-color:#26a2ff;box-sizing:border-box;color:#fff;display:-webkit-box;display:-ms-flexbox;display:flex;font-size:14px;height:40px;line-height:1;padding:0 10px;position:relative;text-align:center;white-space:nowrap}.mint-header .mint-button{background-color:transparent;border:0;box-shadow:none;color:inherit;display:inline-block;font-size:inherit;padding:0}.mint-header .mint-button:after{content:none}.mint-heade"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/css/app.a949a6fd.css",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/css,*/*;q=0.1"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "#app{height:100%;margin:0;padding:0}.mint-header{background-color:#19a0c5;height:50px}.mint-header,.mint-msgbox-cancel,.mint-msgbox-confirm{font-size:large}.mint-msgbox-title{color:#d2691e;font-size:large}.mint-msgbox-message{color:#000;font-size:large}.mint-msgbox-inputType{height:60px}.mint-button:not(.is-disabled):active:after{opacity:.2}.mint-button--primary{background-color:#05afaf}.mint-button--primary.is-plain{border:1px solid #05afaf;color:#05afaf}.mint-badge.is-primary{background-color:"
+    },
+    {
+      "request": {
+        "url": "https://ks.tongji.edu.cn/?ticket=0e86db7c3c31cf1bc39936fcac5ec233&visitor=0&appId=240&synAccessSource=wechat-work&loginFrom=wechat-work&type=app",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Host",
+            "value": "ks.tongji.edu.cn"
+          },
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 15; OPD2407 Build/UKQ1.231108.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Safari/537.36 MMWEBID/3070 wxwork/5.0.9 wwandroidpad MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Dark wwmver/3.26.509.642"
+          },
+          {
+            "name": "Accept",
+            "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+          },
+          {
+            "name": "X-Requested-With",
+            "value": "com.tencent.wework"
+          },
+          {
+            "name": "Referer",
+            "value": "https://pay-yikatong.tongji.edu.cn/"
+          }
+        ]
+      },
+      "response_status": 200,
+      "response_body": "<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0\"><meta name=apple-touch-fullscreen content=yes><meta name=apple-mobile-web-app-capable content=yes><link rel=icon href=/logo.png><title>智能控水</title><style>html,body{\n        height: 100%;\n        padding: 0px;\n        margin: 0px;\n      }</style><script>var ticket=GetQuery(\"ticket\");\n       console.log('++index++ticket++%o', ticket);\n       // if(ticket!="
+    }
+  ],
+  "js_params": {
+    "aes_key_b64": "3n4DdO47LWH2Co/WfpbdyA==",
+    "userpassword": "kv7XjPzrDNJY0pdZ#",
+    "account_from_jwt": "kswater"
+  }
+}
