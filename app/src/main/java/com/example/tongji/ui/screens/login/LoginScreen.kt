@@ -24,9 +24,34 @@ import kotlinx.coroutines.launch
 private const val TAG = "LoginScreen"
 private const val INITIAL_URL = "https://1.tongji.edu.cn"
 private const val ALL_TONGJI_SSO_URL = "https://all.tongji.edu.cn/new/index.html"
+private const val YIKATONG_SSO_URL = "https://yikatong.tongji.edu.cn/user/user"
+private const val SPACE_SSO_URL = "https://space.tongji.edu.cn/api/Oauth3/login"
+
+private const val JWT_HOOK_JS = """
+(function() {
+    if (window.__jwt_hook_installed) return;
+    window.__jwt_hook_installed = true;
+    window.__captured_jwt = '';
+    var origSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function() {
+        var self = this;
+        self.addEventListener('load', function() {
+            try {
+                if (self.responseURL && self.responseURL.indexOf('/api/cas/user') >= 0) {
+                    var data = JSON.parse(self.responseText);
+                    if (data.member && data.member.token) {
+                        window.__captured_jwt = data.member.token;
+                    }
+                }
+            } catch(e) {}
+        });
+        return origSend.apply(self, arguments);
+    };
+})();
+"""
 
 private enum class LoginPhase {
-    IDLE, LOGGED_IN, SSO_DONE
+    IDLE, LOGGED_IN, ALL_TONGJI_DONE, YIKATONG_DONE, SPACE_DONE
 }
 
 private fun syncCookiesToJar(context: android.content.Context, url: String) {
@@ -59,6 +84,15 @@ private fun syncCookiesToJar(context: android.content.Context, url: String) {
     }
 }
 
+private fun extractCasToken(url: String): String? {
+    val marker = "#/cas?cas="
+    val idx = url.indexOf(marker)
+    if (idx < 0) return null
+    val start = idx + marker.length
+    val rest = url.substring(start)
+    return rest.substringBefore("&").substringBefore("#").takeIf { it.isNotEmpty() }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(onBack: () -> Unit) {
@@ -68,6 +102,32 @@ fun LoginScreen(onBack: () -> Unit) {
     var currentUrl by remember { mutableStateOf(INITIAL_URL) }
     var webView by remember { mutableStateOf<WebView?>(null) }
     var loginPhase by remember { mutableStateOf(LoginPhase.IDLE) }
+    var settleRunnable by remember { mutableStateOf<Runnable?>(null) }
+    var spaceCasToken by remember { mutableStateOf<String?>(null) }
+
+    fun cancelSettle() {
+        settleRunnable?.let {
+            webView?.removeCallbacks(it)
+            settleRunnable = null
+        }
+    }
+
+    fun scheduleSettle(view: WebView, tag: String, onSettle: () -> Unit) {
+        cancelSettle()
+        val runnable = Runnable {
+            Log.d(TAG, "$tag 页面稳定 5 秒")
+            onSettle()
+        }
+        settleRunnable = runnable
+        view.postDelayed(runnable, 5000)
+    }
+
+    fun finishSpace() {
+        loginPhase = LoginPhase.SPACE_DONE
+        webView?.destroy()
+        webView = null
+        onBack()
+    }
 
     Scaffold(
         topBar = {
@@ -110,6 +170,7 @@ fun LoginScreen(onBack: () -> Unit) {
                                 super.onPageStarted(view, url, favicon)
                                 Log.d(TAG, "onPageStarted: url=$url")
                                 url?.let { currentUrl = it }
+                                cancelSettle()
                             }
 
                             override fun onPageFinished(view: WebView, url: String) {
@@ -121,16 +182,72 @@ fun LoginScreen(onBack: () -> Unit) {
                                 val host = try { java.net.URL(url).host } catch (_: Exception) { "" }
 
                                 if (host == "all.tongji.edu.cn" && loginPhase == LoginPhase.LOGGED_IN) {
-                                    Log.d(TAG, "all.tongji.edu.cn 加载完成，同步 cookie")
-                                    loginPhase = LoginPhase.SSO_DONE
-                                    syncCookiesToJar(context, url)
-                                    webView?.destroy()
-                                    webView = null
-                                    onBack()
+                                    Log.d(TAG, "all.tongji.edu.cn 加载完成，延迟 5 秒同步 CAS cookie")
+                                    view.postDelayed({
+                                        syncCookiesToJar(context, url)
+                                        loginPhase = LoginPhase.ALL_TONGJI_DONE
+                                        Log.d(TAG, "导航到 yikatong.tongji.edu.cn 获取 SSO cookie")
+                                        view.loadUrl(YIKATONG_SSO_URL)
+                                    }, 5000)
                                     return@onPageFinished
                                 }
 
-                                if (loginPhase == LoginPhase.SSO_DONE) {
+                                if (host == "yikatong.tongji.edu.cn" && loginPhase == LoginPhase.ALL_TONGJI_DONE) {
+                                    scheduleSettle(view, "yikatong") {
+                                        syncCookiesToJar(context, url)
+                                        loginPhase = LoginPhase.YIKATONG_DONE
+                                        Log.d(TAG, "导航到 space.tongji.edu.cn 获取图书馆 SSO")
+                                        view.loadUrl(SPACE_SSO_URL)
+                                    }
+                                    return@onPageFinished
+                                }
+
+                                if (host.contains("space.tongji.edu.cn") && loginPhase == LoginPhase.YIKATONG_DONE) {
+                                    val casToken = extractCasToken(url)
+                                    if (casToken != null) {
+                                        spaceCasToken = casToken
+                                        Log.d(TAG, "捕获 cas token: $casToken")
+                                        view.evaluateJavascript(JWT_HOOK_JS, null)
+                                    }
+                                    scheduleSettle(view, "space") {
+                                        syncCookiesToJar(context, url)
+                                        view.evaluateJavascript("(window.__captured_jwt || '')") { result ->
+                                            val hookJwt = result?.trim('"')?.replace("\\\"", "\"")?.takeIf { it.isNotEmpty() }
+                                            if (hookJwt != null && hookJwt.startsWith("eyJ")) {
+                                                CredentialStore.getInstance(context)
+                                                    .putString(CredentialStore.KEY_LIBRARY_JWT, hookJwt)
+                                                Log.d(TAG, "图书馆 JWT 从 XHR hook 捕获, len=${hookJwt.length}")
+                                                finishSpace()
+                                            } else {
+                                                val token = spaceCasToken
+                                                if (token != null) {
+                                                    scope.launch {
+                                                        try {
+                                                            val jwt = TongjiApp.getInstance().librarySpaceRepository
+                                                                .fetchJwt(token)
+                                                            if (jwt != null) {
+                                                                CredentialStore.getInstance(context)
+                                                                    .putString(CredentialStore.KEY_LIBRARY_JWT, jwt)
+                                                                Log.d(TAG, "图书馆 JWT 从 API 获取, len=${jwt.length}")
+                                                            } else {
+                                                                Log.e(TAG, "图书馆 JWT 为空 (cas token 可能已消耗)")
+                                                            }
+                                                        } catch (e: Exception) {
+                                                            Log.e(TAG, "图书馆 JWT 获取失败: ${e.message}")
+                                                        }
+                                                        finishSpace()
+                                                    }
+                                                } else {
+                                                    Log.e(TAG, "未找到 cas token")
+                                                    finishSpace()
+                                                }
+                                            }
+                                        }
+                                    }
+                                    return@onPageFinished
+                                }
+
+                                if (loginPhase == LoginPhase.YIKATONG_DONE || loginPhase == LoginPhase.SPACE_DONE) {
                                     return@onPageFinished
                                 }
 
