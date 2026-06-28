@@ -28,6 +28,8 @@ import com.example.tongji.ui.screens.card.CampusCardScreen
 import com.example.tongji.ui.screens.exams.ExamScheduleScreen
 import com.example.tongji.ui.screens.grades.GradeReportScreen
 import com.example.tongji.ui.screens.library.LibraryScreen
+import com.example.tongji.ui.screens.library.LibraryDetailScreen
+import com.example.tongji.ui.screens.library.SeatMapScreen
 import com.example.tongji.ui.screens.login.LoginScreen
 import com.example.tongji.state.TermInfo
 import kotlinx.coroutines.launch
@@ -42,6 +44,8 @@ sealed class Screen(val route: String, val title: String) {
     data object Exams : Screen("exams", "考试安排")
     data object Grades : Screen("grades", "课程成绩")
     data object Library : Screen("library", "图书馆座位")
+    data object LibraryDetail : Screen("library_detail/{libraryId}/{libraryName}", "图书馆详情")
+    data object SeatMap : Screen("seat_map/{areaId}/{areaName}", "座位地图")
     data object Login : Screen("login", "登录")
 }
 
@@ -145,7 +149,33 @@ fun AppNavigation() {
                 GradeReportScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Library.route) {
-                LibraryScreen(onBack = { navController.popBackStack() })
+                LibraryScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigateToDetail = { libraryId, libraryName ->
+                        navController.navigate("library_detail/$libraryId/${java.net.URLEncoder.encode(libraryName, "UTF-8")}")
+                    }
+                )
+            }
+            composable(Screen.LibraryDetail.route) { backStackEntry ->
+                val libraryId = backStackEntry.arguments?.getString("libraryId") ?: ""
+                val libraryName = backStackEntry.arguments?.getString("libraryName") ?: ""
+                LibraryDetailScreen(
+                    libraryId = libraryId,
+                    libraryName = libraryName,
+                    onBack = { navController.popBackStack() },
+                    onNavigateToSeatMap = { areaId, areaName ->
+                        navController.navigate("seat_map/$areaId/${java.net.URLEncoder.encode(areaName, "UTF-8")}")
+                    }
+                )
+            }
+            composable(Screen.SeatMap.route) { backStackEntry ->
+                val areaId = backStackEntry.arguments?.getString("areaId") ?: ""
+                val areaName = backStackEntry.arguments?.getString("areaName") ?: ""
+                SeatMapScreen(
+                    areaId = areaId,
+                    areaName = areaName,
+                    onBack = { navController.popBackStack() }
+                )
             }
         }
     }
