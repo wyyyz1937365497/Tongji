@@ -1,77 +1,142 @@
 package com.example.tongji.data.repository
 
+import android.util.Log
 import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.local.dao.CampusCardDao
 import com.example.tongji.data.local.entity.CampusCardBalanceEntity
 import com.example.tongji.data.local.entity.CampusCardTransactionEntity
-import com.example.tongji.data.remote.api.AllTongjiApi
 import com.example.tongji.data.remote.api.YikatongApi
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
+private const val TAG = "YikatongRepository"
+
 class YikatongRepository(
-    private val api: YikatongApi,
-    private val allTongjiApi: AllTongjiApi,
+    private val yikatongApi: YikatongApi,
     private val dao: CampusCardDao,
     private val credentialStore: CredentialStore
 ) {
+
     suspend fun syncBalance(): Result<CampusCardBalanceEntity> = runCatching {
-        val uid = credentialStore.getString(CredentialStore.KEY_UID)
-            ?: throw Exception("未登录，无法获取余额")
-        val resp = allTongjiApi.getCardBalance(uid)
-        val body = resp.body() ?: throw Exception("Empty response")
-        val dataList = body["data"] as? List<Map<String, Any>>
-        val data = dataList?.firstOrNull() ?: throw Exception("No balance data")
+        val cardInfoResp = yikatongApi.getCardInfo()
+        val cardInfoBody = cardInfoResp.body() ?: throw Exception("Empty card info response")
+        val account = parseCardAccount(cardInfoBody)
+            ?: throw Exception("Failed to parse card account")
+
+        val balanceResp = yikatongApi.getCardAccInfo(account)
+        val balanceBody = balanceResp.body() ?: throw Exception("Empty balance response")
+        val balanceYuan = parseBalance(balanceBody)
+            ?: throw Exception("Failed to parse balance")
 
         val balance = CampusCardBalanceEntity(
             capturedAt = System.currentTimeMillis(),
-            balanceYuan = (data["balance"] as? Number)?.toDouble() ?: 0.0,
-            account = uid,
+            balanceYuan = balanceYuan,
+            account = account,
             ownerName = "",
-            cardIdentifier = uid
+            cardIdentifier = account
         )
         dao.insertBalance(balance)
+        Log.d(TAG, "余额同步成功: account=$account balance=$balanceYuan")
         balance
     }
 
-    suspend fun syncTransactions(): Result<Unit> = runCatching {
-        for (page in 1..7) {
-            val resp = api.getTurnover(page = page, size = 100)
-            val body = resp.body() ?: break
-            val list = body["list"] as? List<Map<String, Any>>
-                ?: (body["data"] as? List<Map<String, Any>>)
-                ?: break
-            if (list.isEmpty()) break
-            val transactions = list.map { parseTransaction(it) }
+    suspend fun syncTransactions(days: Int = 30): Result<Int> = runCatching {
+        val cardInfoResp = yikatongApi.getCardInfo()
+        val cardInfoBody = cardInfoResp.body() ?: throw Exception("Empty card info response")
+        val account = parseCardAccount(cardInfoBody)
+            ?: throw Exception("Failed to parse card account")
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val endDate = sdf.format(Date())
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, -days)
+        val startDate = sdf.format(cal.time)
+
+        val resp = yikatongApi.getPersonTrjn(startDate, endDate, account, 1, 50)
+        val body = resp.body() ?: throw Exception("Empty transaction response")
+
+        val total = (body["total"] as? Number)?.toInt() ?: 0
+        @Suppress("UNCHECKED_CAST")
+        val rows = body["rows"] as? List<Map<String, Any>> ?: emptyList()
+
+        val transactions = rows.mapNotNull { row -> parseTransactionRow(row, account) }
+        if (transactions.isNotEmpty()) {
             dao.insertTransactions(transactions)
         }
+        Log.d(TAG, "交易同步成功: total=$total parsed=${transactions.size}")
+        transactions.size
     }
 
     suspend fun getLatestBalance(): CampusCardBalanceEntity? = dao.getLatestBalance()
-    suspend fun getRecentTransactions(limit: Int = 50) = dao.getRecentTransactions(limit)
+    suspend fun getRecentTransactions(limit: Int = 50): List<CampusCardTransactionEntity> =
+        dao.getRecentTransactions(limit)
 
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
-
-    private fun parseTransaction(item: Map<String, Any>): CampusCardTransactionEntity {
-        return CampusCardTransactionEntity(
-            orderId = item["orderId"] as? String ?: UUID.randomUUID().toString(),
-            transactionDateTime = parseDateTime(item["transactionDateTime"] as? String),
-            amountYuan = (item["amount"] as? Number)?.toDouble() ?: 0.0,
-            balanceYuan = (item["balance"] as? Number)?.toDouble() ?: 0.0,
-            transactionDescription = item["description"] as? String ?: item["transactionDescription"] as? String ?: "",
-            turnoverType = item["turnoverType"] as? String ?: item["type"] as? String ?: "",
-            locationName = item["locationName"] as? String ?: item["location"] as? String ?: "",
-            payName = item["payName"] as? String ?: item["merchant"] as? String ?: "",
-            updatedAt = parseDateTime(item["updatedAt"] as? String)
-        )
+    private fun parseCardAccount(body: Map<String, Any>): String? {
+        return try {
+            val msgStr = body["Msg"] as? String ?: return null
+            val msgJson = JSONObject(msgStr)
+            val queryCard = msgJson.optJSONObject("query_card") ?: return null
+            val cardArray = queryCard.optJSONArray("card") ?: return null
+            if (cardArray.length() == 0) return null
+            cardArray.getJSONObject(0).optString("account").takeIf { it.isNotEmpty() }
+        } catch (e: Exception) {
+            Log.e(TAG, "parseCardAccount failed: ${e.message}")
+            null
+        }
     }
 
-    private fun parseDateTime(dateStr: String?): Long {
-        if (dateStr.isNullOrEmpty()) return System.currentTimeMillis()
+    private fun parseBalance(body: Map<String, Any>): Double? {
         return try {
-            dateFormat.parse(dateStr)?.time ?: System.currentTimeMillis()
-        } catch (_: Exception) {
-            System.currentTimeMillis()
+            val msgStr = body["Msg"] as? String ?: return null
+            val msgJson = JSONObject(msgStr)
+            val queryAccInfo = msgJson.optJSONObject("query_accinfo") ?: return null
+            val accInfoArray = queryAccInfo.optJSONArray("accinfo") ?: return null
+            if (accInfoArray.length() == 0) return null
+            val balanceStr = accInfoArray.getJSONObject(0).optString("balance", "0")
+            val balanceFen = balanceStr.toIntOrNull() ?: 0
+            balanceFen / 100.0
+        } catch (e: Exception) {
+            Log.e(TAG, "parseBalance failed: ${e.message}")
+            null
+        }
+    }
+
+    private fun parseTransactionRow(row: Map<String, Any>, account: String): CampusCardTransactionEntity? {
+        return try {
+            val occTime = row["OCCTIME"] as? String ?: return null
+            val mercName = row["MERCNAME"] as? String ?: ""
+            val tranAmt = when (val v = row["TRANAMT"]) {
+                is Number -> v.toDouble() / 100.0
+                is String -> v.toDoubleOrNull()?.div(100.0) ?: 0.0
+                else -> 0.0
+            }
+            val cardBal = when (val v = row["CARDBAL"]) {
+                is Number -> v.toDouble()
+                is String -> v.toDoubleOrNull() ?: 0.0
+                else -> 0.0
+            }
+            val tranName = row["TRANNAME"] as? String ?: ""
+
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val timestamp = dateFormat.parse(occTime)?.time ?: System.currentTimeMillis()
+
+            val orderId = "${occTime}_${mercName}_${tranAmt}".hashCode().toString()
+
+            CampusCardTransactionEntity(
+                orderId = orderId,
+                transactionDateTime = timestamp,
+                amountYuan = tranAmt,
+                balanceYuan = cardBal,
+                transactionDescription = tranName,
+                turnoverType = tranName,
+                locationName = mercName,
+                payName = mercName,
+                updatedAt = System.currentTimeMillis()
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "parseTransactionRow failed: ${e.message}")
+            null
         }
     }
 }

@@ -53,15 +53,6 @@ object NetworkModule {
             .create(StarApi::class.java)
     }
 
-    fun createYikatongApi(context: Context): YikatongApi {
-        return Retrofit.Builder()
-            .baseUrl("https://pay-yikatong.tongji.edu.cn")
-            .client(createOkHttpClient(context))
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(YikatongApi::class.java)
-    }
-
     fun createLibrarySpaceApi(context: Context): LibrarySpaceApi {
         return Retrofit.Builder()
             .baseUrl("https://space.tongji.edu.cn")
@@ -78,5 +69,14 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AllTongjiApi::class.java)
+    }
+
+    fun createYikatongApi(context: Context): YikatongApi {
+        return Retrofit.Builder()
+            .baseUrl("https://yikatong.tongji.edu.cn")
+            .client(createOkHttpClient(context))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(YikatongApi::class.java)
     }
 }

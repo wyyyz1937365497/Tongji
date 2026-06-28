@@ -28,12 +28,18 @@ fun CampusCardScreen(onBack: () -> Unit) {
     var balance by remember { mutableStateOf<CampusCardBalanceEntity?>(null) }
     var transactions by remember { mutableStateOf<List<CampusCardTransactionEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     fun load() {
         scope.launch {
             isLoading = true
-            app.yikatongRepository.syncBalance()
-            app.yikatongRepository.syncTransactions()
+            errorMessage = null
+            try {
+                app.yikatongRepository.syncBalance()
+                app.yikatongRepository.syncTransactions()
+            } catch (e: Exception) {
+                errorMessage = e.message
+            }
             balance = app.yikatongRepository.getLatestBalance()
             transactions = app.yikatongRepository.getRecentTransactions()
             isLoading = false
@@ -74,8 +80,35 @@ fun CampusCardScreen(onBack: () -> Unit) {
                 }
             } else {
                 item { BalanceCard(balance) }
-                items(transactions, key = { it.orderId }) { tx ->
-                    TransactionCard(tx)
+
+                if (errorMessage != null) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Text(
+                                errorMessage ?: "",
+                                modifier = Modifier.padding(16.dp),
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+
+                if (transactions.isNotEmpty()) {
+                    item {
+                        Text(
+                            "最近交易",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                        )
+                    }
+                    items(transactions) { txn ->
+                        TransactionItem(txn)
+                    }
                 }
             }
         }
@@ -114,39 +147,48 @@ private fun BalanceCard(balance: CampusCardBalanceEntity?) {
 }
 
 @Composable
-private fun TransactionCard(transaction: CampusCardTransactionEntity) {
-    val dateFormat = remember { SimpleDateFormat("MM/dd HH:mm", Locale.CHINA) }
+private fun TransactionItem(txn: CampusCardTransactionEntity) {
+    val sdf = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault())
+    val dateStr = sdf.format(Date(txn.transactionDateTime))
+    val isExpense = txn.amountYuan < 0
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    transaction.payName.ifEmpty { transaction.transactionDescription.ifEmpty { "交易" } },
+                    txn.locationName,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(Modifier.height(2.dp))
                 Text(
-                    dateFormat.format(Date(transaction.transactionDateTime)),
+                    "${txn.transactionDescription} · $dateStr",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
-            Text(
-                if (transaction.amountYuan > 0) "-${String.format("%.2f", transaction.amountYuan)}"
-                else "+${String.format("%.2f", -transaction.amountYuan)}",
-                fontWeight = FontWeight.Bold,
-                color = if (transaction.amountYuan > 0)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.End
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    String.format("%.2f", txn.amountYuan),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isExpense) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    }
+                )
+                Text(
+                    "余额 ${String.format("%.2f", txn.balanceYuan)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
         }
     }
 }
