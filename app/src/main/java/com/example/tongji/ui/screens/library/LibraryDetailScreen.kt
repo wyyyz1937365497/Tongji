@@ -24,13 +24,16 @@ fun LibraryDetailScreen(
     libraryId: String,
     libraryName: String,
     onBack: () -> Unit,
-    onNavigateToSeatMap: (areaId: String, areaName: String) -> Unit
+    onNavigateToSeatMap: (areaId: String, areaName: String, labelId: String?) -> Unit
 ) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
     var areas by remember { mutableStateOf<List<AreaInfo>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var selectedTab by remember { mutableIntStateOf(0) }
+    var singleSeatOnly by remember { mutableStateOf(false) }
+    var singleSeatCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
+    var isFilterLoading by remember { mutableStateOf(false) }
 
     fun load() {
         scope.launch {
@@ -41,6 +44,26 @@ fun LibraryDetailScreen(
     }
 
     LaunchedEffect(libraryId) { load() }
+
+    LaunchedEffect(singleSeatOnly, areas) {
+        if (singleSeatOnly && areas.isNotEmpty() && singleSeatCounts.isEmpty()) {
+            isFilterLoading = true
+            val counts = mutableMapOf<String, Int>()
+            areas.forEach { area ->
+                try {
+                    val seats = app.librarySpaceRepository.fetchSeats(area.areaId, "7")
+                    counts[area.areaId] = seats.size
+                } catch (_: Exception) {
+                    counts[area.areaId] = 0
+                }
+            }
+            singleSeatCounts = counts
+            isFilterLoading = false
+        }
+        if (!singleSeatOnly) {
+            singleSeatCounts = emptyMap()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -74,9 +97,27 @@ fun LibraryDetailScreen(
                     CircularProgressIndicator()
                 }
             } else if (selectedTab == 0) {
-                FloorAreaList(areas) { area ->
-                    onNavigateToSeatMap(area.areaId, area.name)
-                }
+                FilterChip(
+                    selected = singleSeatOnly,
+                    onClick = { singleSeatOnly = !singleSeatOnly },
+                    label = { Text(if (isFilterLoading) "查询中…" else "单人座位") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(18.dp))
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+                FloorAreaList(
+                    areas = areas,
+                    singleSeatOnly = singleSeatOnly,
+                    singleSeatCounts = singleSeatCounts,
+                    onAreaClick = { area ->
+                        onNavigateToSeatMap(
+                            area.areaId,
+                            area.name,
+                            if (singleSeatOnly) "7" else null
+                        )
+                    }
+                )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("暂无研讨室数据", color = MaterialTheme.colorScheme.outline)
@@ -87,7 +128,12 @@ fun LibraryDetailScreen(
 }
 
 @Composable
-private fun FloorAreaList(areas: List<AreaInfo>, onAreaClick: (AreaInfo) -> Unit) {
+private fun FloorAreaList(
+    areas: List<AreaInfo>,
+    singleSeatOnly: Boolean = false,
+    singleSeatCounts: Map<String, Int> = emptyMap(),
+    onAreaClick: (AreaInfo) -> Unit
+) {
     val grouped = areas.groupBy { it.floorName.ifEmpty { "其他" } }
     val expandedStates = remember(grouped.keys) {
         mutableStateMapOf<String, Boolean>().apply {
@@ -153,7 +199,15 @@ private fun FloorAreaList(areas: List<AreaInfo>, onAreaClick: (AreaInfo) -> Unit
                         ) {
                             Column(Modifier.weight(1f)) {
                                 Text(area.name, fontWeight = FontWeight.Medium)
-                                if (area.typeName.isNotEmpty()) {
+                                if (singleSeatOnly) {
+                                    val sc = singleSeatCounts[area.areaId] ?: -1
+                                    Text(
+                                        if (sc < 0) "查询中…" else "单人座位 $sc 个",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (sc > 0) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.outline
+                                    )
+                                } else if (area.typeName.isNotEmpty()) {
                                     Text(
                                         area.typeName,
                                         style = MaterialTheme.typography.bodySmall,
@@ -162,10 +216,20 @@ private fun FloorAreaList(areas: List<AreaInfo>, onAreaClick: (AreaInfo) -> Unit
                                 }
                             }
                             Text(
-                                "${area.freeSeats}/${area.totalSeats}",
-                                color = if (area.freeSeats > 0)
-                                    MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.error,
+                                if (singleSeatOnly) {
+                                    val sc = singleSeatCounts[area.areaId] ?: 0
+                                    if (sc > 0) "查看" else "无"
+                                } else {
+                                    "${area.freeSeats}/${area.totalSeats}"
+                                },
+                                color = if (singleSeatOnly) {
+                                    if ((singleSeatCounts[area.areaId] ?: 0) > 0)
+                                        MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.outline
+                                } else {
+                                    if (area.freeSeats > 0) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.error
+                                },
                                 fontWeight = FontWeight.Bold
                             )
                         }

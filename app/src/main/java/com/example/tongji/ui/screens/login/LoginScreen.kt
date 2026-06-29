@@ -8,7 +8,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,13 +19,24 @@ import com.example.tongji.TongjiApp
 import com.example.tongji.auth.CampusModel
 import com.example.tongji.auth.CookieJar
 import com.example.tongji.auth.CredentialStore
+import com.example.tongji.util.WaterCipher
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 private const val TAG = "LoginScreen"
 private const val INITIAL_URL = "https://1.tongji.edu.cn"
 private const val ALL_TONGJI_SSO_URL = "https://all.tongji.edu.cn/new/index.html"
 private const val YIKATONG_SSO_URL = "https://yikatong.tongji.edu.cn/user/user"
 private const val SPACE_SSO_URL = "https://space.tongji.edu.cn/api/Oauth3/login"
+
+private const val PAY_ORIGIN = "https://pay-yikatong.tongji.edu.cn"
+private const val KS_ORIGIN = "https://ks.tongji.edu.cn"
+
+private val WATER_LOGIN_URL: String by lazy {
+    val platUrl = "$PAY_ORIGIN/plat?loginFrom=h5"
+    val inner = "$PAY_ORIGIN/berserker-base/redirect?type=url&url=" + java.net.URLEncoder.encode(platUrl, "UTF-8")
+    "$PAY_ORIGIN/berserker-auth/cas/redirect/bamboocloud?targetUrl=" + java.net.URLEncoder.encode(inner, "UTF-8")
+}
 
 private const val JWT_HOOK_JS = """
 (function() {
@@ -51,7 +62,7 @@ private const val JWT_HOOK_JS = """
 """
 
 private enum class LoginPhase {
-    IDLE, LOGGED_IN, ALL_TONGJI_DONE, YIKATONG_DONE, SPACE_DONE
+    IDLE, LOGGED_IN, ALL_TONGJI_DONE, YIKATONG_DONE, SPACE_DONE, WATER_PENDING, WATER_DONE
 }
 
 private fun syncCookiesToJar(context: android.content.Context, url: String) {
@@ -73,7 +84,7 @@ private fun syncCookiesToJar(context: android.content.Context, url: String) {
                     .value(value.trim())
                     .domain(httpUrl.host)
                     .path("/")
-                    .expiresAt(System.currentTimeMillis() + 86400_000L) // 24h
+                    .expiresAt(System.currentTimeMillis() + 86400_000L)
                     .httpOnly()
                     .build()
             }
@@ -93,6 +104,19 @@ private fun extractCasToken(url: String): String? {
     return rest.substringBefore("&").substringBefore("#").takeIf { it.isNotEmpty() }
 }
 
+private fun extractSynjonesAuth(url: String): String? {
+    return try {
+        val uri = android.net.Uri.parse(url)
+        uri.getQueryParameter("synjones-auth")
+    } catch (_: Exception) { null }
+}
+
+private fun buildWaterRedirectUrl(token: String): String {
+    val encoded = java.net.URLEncoder.encode(token, "UTF-8")
+    return "$PAY_ORIGIN/berserker-base/redirect?appId=240&type=app" +
+            "&synjones-auth=$encoded&synAccessSource=wechat-work&loginFrom=wechat-work"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(onBack: () -> Unit) {
@@ -104,6 +128,7 @@ fun LoginScreen(onBack: () -> Unit) {
     var loginPhase by remember { mutableStateOf(LoginPhase.IDLE) }
     var settleRunnable by remember { mutableStateOf<Runnable?>(null) }
     var spaceCasToken by remember { mutableStateOf<String?>(null) }
+    var waterSynjonesAuth by remember { mutableStateOf<String?>(null) }
 
     fun cancelSettle() {
         settleRunnable?.let {
@@ -122,11 +147,119 @@ fun LoginScreen(onBack: () -> Unit) {
         view.postDelayed(runnable, 5000)
     }
 
-    fun finishSpace() {
-        loginPhase = LoginPhase.SPACE_DONE
+    fun finishLogin() {
+        loginPhase = LoginPhase.WATER_DONE
         webView?.destroy()
         webView = null
         onBack()
+    }
+
+    fun startWaterPhase() {
+        loginPhase = LoginPhase.WATER_PENDING
+        Log.d(TAG, "=== 开始水控 SSO 阶段 ===")
+        Log.d(TAG, "导航到 pay-yikatong 登录入口")
+        webView?.loadUrl(WATER_LOGIN_URL)
+    }
+
+    var waterPhaseDone by remember { mutableStateOf(false) }
+
+    fun saveWaterParams(account: String, aesKey: String, password: String) {
+        val store = CredentialStore.getInstance(context)
+        store.putString(CredentialStore.KEY_WATER_ACCOUNT, account)
+        store.putString(CredentialStore.KEY_WATER_AES_KEY, aesKey)
+        store.putString(CredentialStore.KEY_WATER_PASSWORD, password)
+        TongjiApp.getInstance().waterRepository.setAuthParams(
+            com.example.tongji.data.repository.WaterRepository.WaterAuthParams(account, aesKey, password)
+        )
+        Log.d(TAG, "水控参数已保存 (aesKey from ${if (aesKey == WaterCipher.DEFAULT_AES_KEY) "fallback" else "js"})")
+        syncCookiesToJar(context, KS_ORIGIN)
+        finishLogin()
+    }
+
+    val onWaterAccount: (String?) -> Unit = lambda@{ account ->
+        if (waterPhaseDone) { return@lambda }
+        waterPhaseDone = true
+
+        val acct = account?.trim('"')?.replace("\\\"", "\"")?.takeIf { it.isNotEmpty() }
+        if (acct == null) {
+            Log.e(TAG, "水控: 未能获取 ano")
+            finishLogin()
+            return@lambda
+        }
+        val wv = webView ?: run {
+            Log.e(TAG, "水控: WebView 已销毁")
+            finishLogin()
+            return@lambda
+        }
+        Log.d(TAG, "水控: 获取一卡通号 $acct")
+        wv.evaluateJavascript(
+            """
+            (function() {
+                var scripts = Array.from(document.scripts).map(s => s.src).filter(Boolean);
+                var resources = [];
+                try {
+                    resources = performance.getEntriesByType('resource')
+                        .map(e => e.name).filter(name => name.endsWith('.js'));
+                } catch(e) {}
+                return JSON.stringify({scripts: scripts, resources: resources});
+            })();
+            """.trimIndent()
+        ) { result ->
+            try {
+                val json = JSONObject(result.trim('"').replace("\\\"", "\""))
+                val urls = mutableListOf<String>()
+                val seen = mutableSetOf<String>()
+                val scripts = json.optJSONArray("scripts")
+                val resources = json.optJSONArray("resources")
+                for (i in 0 until (scripts?.length() ?: 0)) {
+                    val u = scripts?.optString(i) ?: continue
+                    if (u.startsWith(KS_ORIGIN) && u.contains(".js") && u !in seen) { seen.add(u); urls.add(u) }
+                }
+                for (i in 0 until (resources?.length() ?: 0)) {
+                    val u = resources?.optString(i) ?: continue
+                    if (u.startsWith(KS_ORIGIN) && u.contains(".js") && u !in seen) { seen.add(u); urls.add(u) }
+                }
+                Log.d(TAG, "水控: 找到 ${urls.size} 个 JS 文件")
+                val jsArray = org.json.JSONArray(urls)
+                wv.evaluateJavascript(
+                    """
+                    (async function() {
+                        var texts = [];
+                        var urls = ${jsArray};
+                        for (var i = 0; i < urls.length; i++) {
+                            try {
+                                var r = await fetch(urls[i]);
+                                if (r.ok) { var t = await r.text(); if (t) texts.push(t); }
+                            } catch(e) {}
+                        }
+                        return JSON.stringify({texts: texts});
+                    })();
+                    """.trimIndent()
+                ) { res ->
+                    var aesKey: String? = null
+                    var password: String? = null
+                    try {
+                        val j = JSONObject(res.trim('"').replace("\\\"", "\""))
+                        val texts = j.optJSONArray("texts")
+                        val jsTexts = mutableListOf<String>()
+                        for (i in 0 until (texts?.length() ?: 0)) {
+                            texts?.optString(i)?.let { jsTexts.add(it) }
+                        }
+                        Log.d(TAG, "水控: 获取到 ${jsTexts.size} 个 JS 文本")
+                        aesKey = WaterCipher.findAesKey(jsTexts)
+                        password = WaterCipher.findPassword(jsTexts)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "水控: 解析 JS 失败", e)
+                    }
+                    if (aesKey == null) aesKey = WaterCipher.DEFAULT_AES_KEY
+                    if (password == null) password = WaterCipher.DEFAULT_PASSWORD
+                    saveWaterParams(acct, aesKey, password)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "水控: 提取 JS URL 失败，使用 fallback 值", e)
+                saveWaterParams(acct, WaterCipher.DEFAULT_AES_KEY, WaterCipher.DEFAULT_PASSWORD)
+            }
+        }
     }
 
     Scaffold(
@@ -139,7 +272,7 @@ fun LoginScreen(onBack: () -> Unit) {
                         webView?.destroy()
                         onBack()
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 }
             )
@@ -161,7 +294,6 @@ fun LoginScreen(onBack: () -> Unit) {
                         settings.displayZoomControls = false
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
-                        settings.userAgentString = settings.userAgentString
 
                         CookieManager.getInstance().setAcceptCookie(true)
 
@@ -181,6 +313,36 @@ fun LoginScreen(onBack: () -> Unit) {
 
                                 val host = try { java.net.URL(url).host } catch (_: Exception) { "" }
 
+                                // ===== 水控阶段: pay-yikatong → 捕获 synjones-auth =====
+                                if (loginPhase == LoginPhase.WATER_PENDING && host.contains("pay-yikatong.tongji.edu.cn")) {
+                                    val token = extractSynjonesAuth(url)
+                                    if (token != null && token.isNotEmpty()) {
+                                        waterSynjonesAuth = token
+                                        Log.d(TAG, "水控: 捕获 synjones-auth, 准备跳转 ks")
+                                        view.postDelayed({
+                                            view.loadUrl(buildWaterRedirectUrl(token))
+                                        }, 1500)
+                                    }
+                                    return@onPageFinished
+                                }
+
+                                // ===== 水控阶段: ks.tongji.edu.cn → 提取参数后关闭 =====
+                                if (loginPhase == LoginPhase.WATER_PENDING && url.startsWith(KS_ORIGIN) && !waterPhaseDone) {
+                                    Log.d(TAG, "水控: 到达 ks.tongji.edu.cn, 等待页面加载后提取参数")
+                                    view.postDelayed({
+                                        if (waterPhaseDone) return@postDelayed
+                                        view.evaluateJavascript("(function() { return sessionStorage.getItem('ano') || ''; })();") { result ->
+                                            onWaterAccount(result)
+                                        }
+                                    }, 3000)
+                                    return@onPageFinished
+                                }
+
+                                if (loginPhase == LoginPhase.WATER_PENDING || loginPhase == LoginPhase.WATER_DONE) {
+                                    return@onPageFinished
+                                }
+
+                                // ===== all.tongji 阶段 =====
                                 if (host == "all.tongji.edu.cn" && loginPhase == LoginPhase.LOGGED_IN) {
                                     Log.d(TAG, "all.tongji.edu.cn 加载完成，延迟 5 秒同步 CAS cookie")
                                     view.postDelayed({
@@ -192,6 +354,7 @@ fun LoginScreen(onBack: () -> Unit) {
                                     return@onPageFinished
                                 }
 
+                                // ===== yikatong 阶段 =====
                                 if (host == "yikatong.tongji.edu.cn" && loginPhase == LoginPhase.ALL_TONGJI_DONE) {
                                     scheduleSettle(view, "yikatong") {
                                         syncCookiesToJar(context, url)
@@ -202,6 +365,7 @@ fun LoginScreen(onBack: () -> Unit) {
                                     return@onPageFinished
                                 }
 
+                                // ===== space 阶段 =====
                                 if (host.contains("space.tongji.edu.cn") && loginPhase == LoginPhase.YIKATONG_DONE) {
                                     val casToken = extractCasToken(url)
                                     if (casToken != null) {
@@ -217,7 +381,7 @@ fun LoginScreen(onBack: () -> Unit) {
                                                 CredentialStore.getInstance(context)
                                                     .putString(CredentialStore.KEY_LIBRARY_JWT, hookJwt)
                                                 Log.d(TAG, "图书馆 JWT 从 XHR hook 捕获, len=${hookJwt.length}")
-                                                finishSpace()
+                                                startWaterPhase()
                                             } else {
                                                 val token = spaceCasToken
                                                 if (token != null) {
@@ -235,11 +399,11 @@ fun LoginScreen(onBack: () -> Unit) {
                                                         } catch (e: Exception) {
                                                             Log.e(TAG, "图书馆 JWT 获取失败: ${e.message}")
                                                         }
-                                                        finishSpace()
+                                                        startWaterPhase()
                                                     }
                                                 } else {
                                                     Log.e(TAG, "未找到 cas token")
-                                                    finishSpace()
+                                                    startWaterPhase()
                                                 }
                                             }
                                         }
@@ -247,16 +411,16 @@ fun LoginScreen(onBack: () -> Unit) {
                                     return@onPageFinished
                                 }
 
-                                if (loginPhase == LoginPhase.YIKATONG_DONE || loginPhase == LoginPhase.SPACE_DONE) {
+                                if (loginPhase == LoginPhase.YIKATONG_DONE ||
+                                    loginPhase == LoginPhase.SPACE_DONE ||
+                                    loginPhase == LoginPhase.WATER_PENDING ||
+                                    loginPhase == LoginPhase.WATER_DONE) {
                                     return@onPageFinished
                                 }
 
+                                // ===== 1.tongji 登录阶段 =====
                                 if (host.contains("1.tongji.edu.cn") || host.contains("workbench.tongji.edu.cn")) {
                                     Log.d(TAG, "命中一系统域名，开始提取凭证")
-
-                                    val cookieStr = CookieManager.getInstance().getCookie(url)
-                                    Log.d(TAG, "cookies: ${cookieStr?.take(200)}")
-
                                     try {
                                         val uri = java.net.URI.create(url)
                                         val queryMap = mutableMapOf<String, String>()
@@ -277,18 +441,13 @@ fun LoginScreen(onBack: () -> Unit) {
                                             Log.d(TAG, "导航到 all.tongji.edu.cn 获取 SSO cookie")
                                             view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
-                                                try {
-                                                    TongjiApp.getInstance().sessionRepository.refreshSessionUser()
-                                                } catch (_: Exception) { }
+                                                try { TongjiApp.getInstance().sessionRepository.refreshSessionUser() } catch (_: Exception) { }
                                             }
                                             return@onPageFinished
-                                        } else if (!urlUid.isNullOrEmpty()) {
-                                            Log.d(TAG, "URL uid 不是学号，跳过: $urlUid")
                                         }
                                     } catch (e: Exception) {
                                         Log.w(TAG, "从 URL 提取 uid 失败: ${e.message}")
                                     }
-
                                     tryExtractSessionData(view, url, 1)
                                 }
                             }
@@ -313,7 +472,6 @@ fun LoginScreen(onBack: () -> Unit) {
                                     "  return JSON.stringify({uid: '', sessionId: sid});" +
                                     "})();"
                                 ) { result ->
-                                    Log.d(TAG, "evaluateJavascript sessiondata (attempt=$attempt): ${result?.take(300)}")
                                     try {
                                         val jsResult = result?.trim('"')?.replace("\\\"", "\"") ?: "{}"
                                         val json = org.json.JSONObject(jsResult)
@@ -321,10 +479,8 @@ fun LoginScreen(onBack: () -> Unit) {
                                         val aesKey = json.optString("aesKey", "").takeIf { it.isNotEmpty() }
                                         val aesIv = json.optString("aesIv", "").takeIf { it.isNotEmpty() }
                                         val sessionId = json.optString("sessionId", "").takeIf { it.isNotEmpty() }
-                                        Log.d(TAG, "解析 localStorage uid='$uid' aesKey=${aesKey != null} sessionId=${sessionId != null}")
 
                                         if (uid.isNotEmpty()) {
-                                            Log.d(TAG, "登录成功! uid=$uid sessionId=${sessionId?.take(8)}")
                                             val store = CredentialStore.getInstance(context)
                                             store.putString(CredentialStore.KEY_UID, uid)
                                             aesKey?.let { store.putString(CredentialStore.KEY_AES_KEY, it) }
@@ -333,19 +489,11 @@ fun LoginScreen(onBack: () -> Unit) {
                                             CampusModel.markValid()
                                             syncCookiesToJar(context, url)
                                             loginPhase = LoginPhase.LOGGED_IN
-                                            Log.d(TAG, "导航到 all.tongji.edu.cn 获取 SSO cookie")
                                             view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
-                                                try {
-                                                    Log.d(TAG, "刷新 session...")
-                                                    TongjiApp.getInstance().sessionRepository.refreshSessionUser()
-                                                    Log.d(TAG, "session 刷新完成")
-                                                } catch (e: Exception) {
-                                                    Log.e(TAG, "session 刷新失败: ${e.message}", e)
-                                                }
+                                                try { TongjiApp.getInstance().sessionRepository.refreshSessionUser() } catch (e: Exception) { Log.e(TAG, "session 刷新失败: ${e.message}") }
                                             }
                                         } else {
-                                            Log.d(TAG, "uid 为空，1.5秒后重试 (attempt=$attempt)")
                                             view.postDelayed({ tryExtractSessionData(view, url, attempt + 1) }, 1500)
                                         }
                                     } catch (e: Exception) {

@@ -1,6 +1,7 @@
 package com.example.tongji.data.repository
 
 import android.util.Log
+import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.remote.api.WaterApi
 import com.example.tongji.data.remote.model.WaterController
 import com.example.tongji.data.remote.model.WaterGroup
@@ -12,7 +13,10 @@ import java.util.Locale
 
 private const val TAG = "WaterRepository"
 
-class WaterRepository(private val waterApi: WaterApi) {
+class WaterRepository(
+    private val waterApi: WaterApi,
+    private val credentialStore: CredentialStore
+) {
 
     data class WaterAuthParams(
         val account: String,
@@ -23,9 +27,42 @@ class WaterRepository(private val waterApi: WaterApi) {
     private var cachedParams: WaterAuthParams? = null
     private var cachedToken: String? = null
 
+    init {
+        // Try to load persisted params
+        loadPersistedParams()
+    }
+
     fun setAuthParams(params: WaterAuthParams) {
         cachedParams = params
         cachedToken = null // invalidate token
+        // Persist params
+        credentialStore.putString(CredentialStore.KEY_WATER_ACCOUNT, params.account)
+        credentialStore.putString(CredentialStore.KEY_WATER_AES_KEY, params.aesKey)
+        credentialStore.putString(CredentialStore.KEY_WATER_PASSWORD, params.password)
+        Log.d(TAG, "认证参数已持久化")
+    }
+
+    fun hasAuthParams(): Boolean {
+        return cachedParams != null || credentialStore.contains(CredentialStore.KEY_WATER_ACCOUNT)
+    }
+
+    private fun loadPersistedParams() {
+        val account = credentialStore.getString(CredentialStore.KEY_WATER_ACCOUNT)
+        val aesKey = credentialStore.getString(CredentialStore.KEY_WATER_AES_KEY)
+        val password = credentialStore.getString(CredentialStore.KEY_WATER_PASSWORD)
+        if (account != null && aesKey != null && password != null) {
+            cachedParams = WaterAuthParams(account, aesKey, password)
+            Log.d(TAG, "已从持久化存储加载认证参数")
+        }
+    }
+
+    fun clearPersistedParams() {
+        cachedParams = null
+        cachedToken = null
+        credentialStore.remove(CredentialStore.KEY_WATER_ACCOUNT)
+        credentialStore.remove(CredentialStore.KEY_WATER_AES_KEY)
+        credentialStore.remove(CredentialStore.KEY_WATER_PASSWORD)
+        Log.d(TAG, "认证参数已清除")
     }
 
     suspend fun fetchGroups(): Result<List<WaterGroup>> = runCatching {

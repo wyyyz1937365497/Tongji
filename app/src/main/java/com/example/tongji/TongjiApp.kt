@@ -47,7 +47,7 @@ class TongjiApp : Application() {
         yikatongRepository = YikatongRepository(yikatongApi, database.campusCardDao(), credentialStore)
         librarySpaceRepository = LibrarySpaceRepository(librarySpaceApi, database.librarySpaceDao())
         sessionRepository = SessionRepository(tongjiApi, credentialStore)
-        waterRepository = WaterRepository(waterApi)
+        waterRepository = WaterRepository(waterApi, credentialStore)
 
         val uid = credentialStore.getString(CredentialStore.KEY_UID)
         if (uid != null) {

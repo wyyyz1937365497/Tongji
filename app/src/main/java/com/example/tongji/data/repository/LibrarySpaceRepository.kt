@@ -33,7 +33,8 @@ data class SeatInfo(
     val width: Float,
     val height: Float,
     val status: String,
-    val statusName: String
+    val statusName: String,
+    val inLabel: Int = 0
 )
 
 class LibrarySpaceRepository(
@@ -118,7 +119,7 @@ class LibrarySpaceRepository(
             }
     }
 
-    suspend fun fetchSeats(areaId: String): List<SeatInfo> {
+    suspend fun fetchSeats(areaId: String, labelId: String? = null): List<SeatInfo> {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
         val dateResp = api.getSeatDates(mapOf("build_id" to areaId))
@@ -139,13 +140,18 @@ class LibrarySpaceRepository(
         val startTime = segment["start"] as? String ?: "00:00"
         val endTime = segment["end"] as? String ?: "23:59"
 
-        val seatResp = api.getSeats(mapOf(
+        val requestBody = mutableMapOf<String, Any>(
             "area" to areaId,
             "segment" to segmentId,
             "day" to day,
             "startTime" to startTime,
             "endTime" to endTime
-        ))
+        )
+        if (labelId != null) {
+            requestBody["label_id"] = labelId
+        }
+
+        val seatResp = api.getSeats(requestBody)
         val seatBody = seatResp.body() ?: return emptyList()
 
         @Suppress("UNCHECKED_CAST")
@@ -160,8 +166,11 @@ class LibrarySpaceRepository(
                 width = (s["width"] as? String)?.toFloatOrNull() ?: 2f,
                 height = (s["height"] as? String)?.toFloatOrNull() ?: 3f,
                 status = s["status"] as? String ?: "0",
-                statusName = s["status_name"] as? String ?: ""
+                statusName = s["status_name"] as? String ?: "",
+                inLabel = (s["in_label"] as? Number)?.toInt() ?: 0
             )
+        }.let { list ->
+            if (labelId != null) list.filter { it.inLabel == 1 } else list
         }
     }
 

@@ -44,7 +44,7 @@ fun statusToImageType(status: String): String = when (status) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeatMapScreen(areaId: String, areaName: String, onBack: () -> Unit) {
+fun SeatMapScreen(areaId: String, areaName: String, labelId: String? = null, onBack: () -> Unit) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
     var seats by remember { mutableStateOf<List<SeatInfo>>(emptyList()) }
@@ -57,7 +57,7 @@ fun SeatMapScreen(areaId: String, areaName: String, onBack: () -> Unit) {
             isLoading = true
             errorMsg = null
             try {
-                val seatsDeferred = async { app.librarySpaceRepository.fetchSeats(areaId) }
+                val seatsDeferred = async { app.librarySpaceRepository.fetchSeats(areaId, labelId) }
                 val mapUrlsDeferred = async { app.librarySpaceRepository.fetchSeatMap(areaId) }
 
                 val seatList = seatsDeferred.await()
@@ -163,7 +163,7 @@ private fun ZoomableSeatMap(
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
-    val baseBitmap = imageMap["free"] ?: imageMap.values.firstOrNull()
+    val baseBitmap = imageMap["not"] ?: imageMap["free"] ?: imageMap.values.firstOrNull()
     if (baseBitmap == null) {
         Box(modifier, contentAlignment = Alignment.Center) {
             Text("图片加载失败", color = MaterialTheme.colorScheme.outline)

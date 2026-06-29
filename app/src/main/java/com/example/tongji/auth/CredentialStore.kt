@@ -55,6 +55,10 @@ class CredentialStore private constructor(context: Context) {
         const val KEY_AUTO_LOGIN_USERNAME = "auto_login_username"
         const val KEY_AUTO_LOGIN_PASSWORD = "auto_login_password"
 
+        const val KEY_WATER_ACCOUNT = "water_account"
+        const val KEY_WATER_AES_KEY = "water_aes_key"
+        const val KEY_WATER_PASSWORD = "water_password"
+
         @Volatile
         private var instance: CredentialStore? = null
 

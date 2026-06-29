@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,13 +25,14 @@ import kotlinx.coroutines.launch
 fun WaterControlScreen(onBack: () -> Unit) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
+
     var groups by remember { mutableStateOf<List<WaterGroup>>(emptyList()) }
     var controllers by remember { mutableStateOf<Map<String, List<WaterController>>>(emptyMap()) }
     var expandedGroup by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    fun load() {
+    fun loadData() {
         scope.launch {
             isLoading = true
             errorMessage = null
@@ -61,7 +63,7 @@ fun WaterControlScreen(onBack: () -> Unit) {
         }
     }
 
-    LaunchedEffect(Unit) { load() }
+    LaunchedEffect(Unit) { loadData() }
 
     Scaffold(
         topBar = {
@@ -69,11 +71,11 @@ fun WaterControlScreen(onBack: () -> Unit) {
                 title = { Text("智能控水") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { load() }) {
+                    IconButton(onClick = { loadData() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "刷新")
                     }
                 }
@@ -81,7 +83,7 @@ fun WaterControlScreen(onBack: () -> Unit) {
         }
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            if (isLoading) {
+            if (isLoading && groups.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -98,11 +100,25 @@ fun WaterControlScreen(onBack: () -> Unit) {
                                     containerColor = MaterialTheme.colorScheme.errorContainer
                                 )
                             ) {
-                                Text(
-                                    errorMessage ?: "",
-                                    modifier = Modifier.padding(16.dp),
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
+                                Column(Modifier.padding(16.dp)) {
+                                    Text(
+                                        errorMessage ?: "",
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    Spacer(Modifier.height(8.dp))
+                                    TextButton(onClick = { loadData() }) { Text("重试") }
+                                }
+                            }
+                        }
+                    }
+
+                    if (groups.isEmpty() && !isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("暂无数据，请先在设置中登录", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -147,11 +163,7 @@ private fun GroupCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        group.className ?: "未知分组",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    Text(group.className ?: "未知分组", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Text(
                         "编号: ${group.classNo ?: "-"}",
                         style = MaterialTheme.typography.bodySmall,
@@ -159,8 +171,7 @@ private fun GroupCard(
                     )
                 }
                 Icon(
-                    if (isExpanded) Icons.Default.KeyboardArrowUp
-                    else Icons.Default.KeyboardArrowDown,
+                    if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null
                 )
             }
@@ -168,17 +179,14 @@ private fun GroupCard(
             if (isExpanded) {
                 Spacer(Modifier.height(12.dp))
                 if (controllers.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    Box(Modifier.fillMaxWidth().height(60.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(Modifier.size(24.dp))
                     }
                 } else {
                     controllers.forEach { controller ->
                         ControllerItem(controller)
                         if (controller != controllers.last()) {
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            HorizontalDivider(Modifier.padding(vertical = 8.dp))
                         }
                     }
                 }
@@ -201,22 +209,14 @@ private fun ControllerItem(controller: WaterController) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                controller.className ?: "未知控水器",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
+        Column(Modifier.weight(1f)) {
+            Text(controller.className ?: "未知控水器", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
             Text(
                 "编号: ${controller.classNo ?: "-"}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Text(
-            status,
-            fontWeight = FontWeight.Bold,
-            color = statusColor
-        )
+        Text(status, fontWeight = FontWeight.Bold, color = statusColor)
     }
 }

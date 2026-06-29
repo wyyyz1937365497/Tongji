@@ -1,3 +1,10 @@
+# Playwright / Python scripts
+.pw-water-profile/
+water_output/
+water_auth_state.json
+water_state_*.json
+water_capture_*.json
+
 *.iml
 .gradle
 /local.properties
