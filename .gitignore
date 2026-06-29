@@ -18,6 +18,8 @@ local.properties
 app/build/
 .env
 .omo/
+*.json
+*.har
 calendarview/build/
 respons.json
 respons copy.json
