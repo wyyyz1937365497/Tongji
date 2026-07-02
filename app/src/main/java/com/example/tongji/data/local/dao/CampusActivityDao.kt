@@ -14,6 +14,23 @@ interface CampusActivityDao {
     @Query("SELECT * FROM campus_activities WHERE remoteId = :id")
     suspend fun getById(id: Long): CampusActivityEntity?
 
+    /**
+     * 带筛选条件的查询
+     */
+    @Query("""
+        SELECT * FROM campus_activities
+        WHERE (:moduleCode IS NULL OR moduleCode = :moduleCode)
+        AND (:progressName IS NULL OR progressName = :progressName)
+        ORDER BY activityDate DESC
+    """)
+    suspend fun getFiltered(moduleCode: String?, progressName: String?): List<CampusActivityEntity>
+
+    /**
+     * 获取活动总数
+     */
+    @Query("SELECT COUNT(*) FROM campus_activities")
+    suspend fun getCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(activities: List<CampusActivityEntity>)
 

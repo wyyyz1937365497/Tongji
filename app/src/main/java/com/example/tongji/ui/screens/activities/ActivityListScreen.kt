@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +22,14 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,22 +37,42 @@ fun ActivityListScreen(onBack: () -> Unit) {
     val app = TongjiApp.getInstance()
     val scope = rememberCoroutineScope()
     var activities by remember { mutableStateOf<List<CampusActivityEntity>>(emptyList()) }
+    var filtered by remember { mutableStateOf<List<CampusActivityEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var selectedModule by remember { mutableStateOf<String?>(null) }
     var selectedStatus by remember { mutableStateOf<String?>(null) }
+    var preloadTrigger by remember { mutableStateOf(0) }
+
+    // 退出时取消预加载
+    DisposableEffect(Unit) {
+        onDispose {
+            app.activityRepository.cancelPreload()
+        }
+    }
 
     fun load() {
         scope.launch {
             isLoading = true
             error = null
             app.activityRepository.sync()
-                .onSuccess { activities = app.activityRepository.getAll() }
+                .onSuccess {
+                    activities = app.activityRepository.getAll()
+                    filtered = app.activityRepository.getFiltered(selectedModule, selectedStatus)
+                }
                 .onFailure {
                     error = it.message ?: "加载失败"
                     activities = app.activityRepository.getAll()
+                    filtered = app.activityRepository.getFiltered(selectedModule, selectedStatus)
                 }
             isLoading = false
+        }
+    }
+
+    // 筛选条件变化时重新查询数据库
+    LaunchedEffect(selectedModule, selectedStatus, activities) {
+        scope.launch {
+            filtered = app.activityRepository.getFiltered(selectedModule, selectedStatus)
         }
     }
 
@@ -56,20 +85,13 @@ fun ActivityListScreen(onBack: () -> Unit) {
         activities.mapNotNull { it.progressName }.filter { it.isNotEmpty() }.distinct()
     }
 
-    val filtered = remember(activities, selectedModule, selectedStatus) {
-        activities.filter { a ->
-            (selectedModule == null || a.moduleCode == selectedModule) &&
-            (selectedStatus == null || a.progressName == selectedStatus)
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("卓越星活动") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 },
                 actions = {
@@ -130,7 +152,7 @@ fun ActivityListScreen(onBack: () -> Unit) {
                         }
                         item {
                             Text(
-                                "共 ${filtered.size} / ${activities.size} 个活动",
+                                "共 ${filtered.size} / ${activities.size} 个活动${if (activities.size >= 1000) "（已达到加载上限）" else ""}",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -138,6 +160,21 @@ fun ActivityListScreen(onBack: () -> Unit) {
                         }
                         items(filtered, key = { it.remoteId }) { activity ->
                             ActivityCard(activity)
+                        }
+
+                        // 预加载触发：当活动数量达到250的倍数且未达到上限时触发
+                        item {
+                            LaunchedEffect(activities.size) {
+                                val currentCount = activities.size
+                                if (currentCount > 0 && currentCount % 250 == 0 && currentCount < 1000) {
+                                    app.activityRepository.preloadMore { newCount ->
+                                        scope.launch {
+                                            activities = app.activityRepository.getAll()
+                                            filtered = app.activityRepository.getFiltered(selectedModule, selectedStatus)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
