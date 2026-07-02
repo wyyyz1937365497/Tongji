@@ -107,8 +107,8 @@ class YikatongRepository(
             val occTime = row["OCCTIME"] as? String ?: return null
             val mercName = row["MERCNAME"] as? String ?: ""
             val tranAmt = when (val v = row["TRANAMT"]) {
-                is Number -> v.toDouble() / 100.0
-                is String -> v.toDoubleOrNull()?.div(100.0) ?: 0.0
+                is Number -> v.toDouble()
+                is String -> v.toDoubleOrNull() ?: 0.0
                 else -> 0.0
             }
             val cardBal = when (val v = row["CARDBAL"]) {
