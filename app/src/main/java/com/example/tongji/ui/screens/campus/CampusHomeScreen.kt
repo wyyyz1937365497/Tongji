@@ -58,16 +58,25 @@ fun CampusHomeScreen(
             TopAppBar(
                 title = { Text("校园") },
                 actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            val store = CredentialStore.getInstance(app)
-                            store.clear()
-                            CampusModel.markLoggedOut()
-                            CampusModel.clearProfile()
-                            onNavigateToLogin()
+                    Row(
+                        modifier = Modifier.padding(end = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "刷新数据",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        IconButton(onClick = {
+                            scope.launch {
+                                val store = CredentialStore.getInstance(app)
+                                store.clear()
+                                CampusModel.markLoggedOut()
+                                CampusModel.clearProfile()
+                                onNavigateToLogin()
+                            }
+                        }) {
+                            Icon(Icons.Default.Refresh, contentDescription = "刷新数据")
                         }
-                    }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "刷新数据")
                     }
                 }
             )
