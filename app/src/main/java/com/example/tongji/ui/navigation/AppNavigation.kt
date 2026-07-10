@@ -127,7 +127,8 @@ fun AppNavigation() {
                     onNavigateToExams = { navController.navigate(Screen.Exams.route) },
                     onNavigateToGrades = { navController.navigate(Screen.Grades.route) },
                     onNavigateToLibrary = { navController.navigate(Screen.Library.route) },
-                    onNavigateToWater = { navController.navigate(Screen.WaterControl.route) }
+                    onNavigateToWater = { navController.navigate(Screen.WaterControl.route) },
+                    onNavigateToLogin = { navController.navigate(Screen.Login.route) }
                 )
             }
             composable(Screen.Settings.route) {

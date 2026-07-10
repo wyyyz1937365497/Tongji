@@ -56,13 +56,6 @@ fun TeachingNoticeScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "返回")
                     }
                 },
-                actions = {
-                    if (selectedNoticeId == null) {
-                        IconButton(onClick = { load() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "刷新")
-                        }
-                    }
-                },
                 scrollBehavior = scrollBehavior
             )
         }

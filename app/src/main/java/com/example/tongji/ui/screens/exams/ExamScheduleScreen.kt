@@ -54,9 +54,6 @@ fun ExamScheduleScreen(onBack: () -> Unit) {
                             CalendarExporter.exportExams(ctx, scheduledExams)
                         })
                     }
-                    IconButton(onClick = { load() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "刷新")
-                    }
                 }
             )
         }

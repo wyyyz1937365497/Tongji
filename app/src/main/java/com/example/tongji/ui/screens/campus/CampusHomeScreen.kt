@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tongji.TongjiApp
+import com.example.tongji.auth.CampusModel
+import com.example.tongji.auth.CredentialStore
 import kotlinx.coroutines.launch
 
 data class CampusService(
@@ -34,7 +36,8 @@ fun CampusHomeScreen(
     onNavigateToExams: () -> Unit,
     onNavigateToGrades: () -> Unit,
     onNavigateToLibrary: () -> Unit,
-    onNavigateToWater: () -> Unit
+    onNavigateToWater: () -> Unit,
+    onNavigateToLogin: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val app = TongjiApp.getInstance()
@@ -55,11 +58,16 @@ fun CampusHomeScreen(
             TopAppBar(
                 title = { Text("校园") },
                 actions = {
-                    if (refreshing) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp).padding(end = 12.dp),
-                            strokeWidth = 2.dp
-                        )
+                    IconButton(onClick = {
+                        scope.launch {
+                            val store = CredentialStore.getInstance(app)
+                            store.clear()
+                            CampusModel.markLoggedOut()
+                            CampusModel.clearProfile()
+                            onNavigateToLogin()
+                        }
+                    }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "刷新数据")
                     }
                 }
             )
