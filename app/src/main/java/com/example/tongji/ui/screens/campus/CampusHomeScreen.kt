@@ -37,6 +37,7 @@ fun CampusHomeScreen(
     onNavigateToGrades: () -> Unit,
     onNavigateToLibrary: () -> Unit,
     onNavigateToWater: () -> Unit,
+    onNavigateToShuttle: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
@@ -50,7 +51,8 @@ fun CampusHomeScreen(
         CampusService("考试安排", Icons.Default.EditCalendar, "查看考试信息", onNavigateToExams),
         CampusService("课程成绩", Icons.Default.Grade, "GPA与成绩", onNavigateToGrades),
         CampusService("图书馆座位", Icons.Default.MenuBook, "座位查询", onNavigateToLibrary),
-        CampusService("智能控水", Icons.Default.WaterDrop, "浴室控水器状态", onNavigateToWater)
+        CampusService("智能控水", Icons.Default.WaterDrop, "浴室控水器状态", onNavigateToWater),
+        CampusService("班车时刻表", Icons.Default.DirectionsBus, "查看班车时间", onNavigateToShuttle)
     )
 
     Scaffold(
