@@ -441,7 +441,10 @@ fun LoginScreen(onBack: () -> Unit) {
                                             Log.d(TAG, "导航到 all.tongji.edu.cn 获取 SSO cookie")
                                             view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
-                                                try { TongjiApp.getInstance().sessionRepository.refreshSessionUser() } catch (_: Exception) { }
+                                                try {
+                                                    TongjiApp.getInstance().sessionRepository.refreshSessionUser()
+                                                    TongjiApp.getInstance().courseRepository.refreshTermInfo()
+                                                } catch (_: Exception) { }
                                             }
                                             return@onPageFinished
                                         }
@@ -464,7 +467,7 @@ fun LoginScreen(onBack: () -> Unit) {
                                     "  if (sd) {" +
                                     "    try {" +
                                     "      var p = JSON.parse(sd);" +
-                                    "      return JSON.stringify({uid: p.uid || p.UID || '', aesKey: p.aesKey || '', aesIv: p.aesIv || '', sessionId: sid});" +
+                                    "      return JSON.stringify({uid: p.uid || p.UID || '', name: p.name || p.xm || '', aesKey: p.aesKey || '', aesIv: p.aesIv || '', sessionId: sid});" +
                                     "    } catch(e) {" +
                                     "      return JSON.stringify({uid: sd || '', sessionId: sid});" +
                                     "    }" +
@@ -476,6 +479,8 @@ fun LoginScreen(onBack: () -> Unit) {
                                         val jsResult = result?.trim('"')?.replace("\\\"", "\"") ?: "{}"
                                         val json = org.json.JSONObject(jsResult)
                                         val uid = json.optString("uid", "")
+                                        val name = json.optString("name", "").takeIf { it.isNotEmpty() }
+                                        Log.d(TAG, "从 sessiondata 提取到 name: $name")
                                         val aesKey = json.optString("aesKey", "").takeIf { it.isNotEmpty() }
                                         val aesIv = json.optString("aesIv", "").takeIf { it.isNotEmpty() }
                                         val sessionId = json.optString("sessionId", "").takeIf { it.isNotEmpty() }
@@ -483,6 +488,10 @@ fun LoginScreen(onBack: () -> Unit) {
                                         if (uid.isNotEmpty()) {
                                             val store = CredentialStore.getInstance(context)
                                             store.putString(CredentialStore.KEY_UID, uid)
+                                            name?.let {
+                                                store.putString(CredentialStore.KEY_NAME, it)
+                                                Log.d(TAG, "已保存 KEY_NAME 到 CredentialStore: $it")
+                                            } ?: Log.w(TAG, "name 为空，未保存到 CredentialStore")
                                             aesKey?.let { store.putString(CredentialStore.KEY_AES_KEY, it) }
                                             aesIv?.let { store.putString(CredentialStore.KEY_AES_IV, it) }
                                             sessionId?.let { store.putString(CredentialStore.KEY_SESSION_ID, it) }
@@ -491,7 +500,10 @@ fun LoginScreen(onBack: () -> Unit) {
                                             loginPhase = LoginPhase.LOGGED_IN
                                             view.loadUrl(ALL_TONGJI_SSO_URL)
                                             scope.launch {
-                                                try { TongjiApp.getInstance().sessionRepository.refreshSessionUser() } catch (e: Exception) { Log.e(TAG, "session 刷新失败: ${e.message}") }
+                                                try {
+                                                    TongjiApp.getInstance().sessionRepository.refreshSessionUser()
+                                                    TongjiApp.getInstance().courseRepository.refreshTermInfo()
+                                                } catch (e: Exception) { Log.e(TAG, "session 或 term 刷新失败: ${e.message}") }
                                             }
                                         } else {
                                             view.postDelayed({ tryExtractSessionData(view, url, attempt + 1) }, 1500)

@@ -19,21 +19,22 @@ class TongjiAuthCoordinator(private val context: Context) {
                 override fun onPageFinished(view: WebView, url: String) {
                     if (url.contains("workbench.tongji.edu.cn") || url.contains("1.tongji.edu.cn")) {
                         view.evaluateJavascript(
-                            "(function() { return JSON.stringify({uid: localStorage.getItem('sessiondata') || '{}'}); })();"
+                            "(function() { var sd = localStorage.getItem('sessiondata'); if (sd) { try { var p = JSON.parse(sd); return JSON.stringify({uid: p.uid || p.UID || '', name: p.name || p.xm || '', aesKey: p.aesKey || '', aesIv: p.aesIv || ''}); } catch(e) {} } return JSON.stringify({}); })();"
                         ) { result ->
                             try {
                                 val json = org.json.JSONObject(result.trim('"').replace("\\\"", "\""))
-                                val sessionData = json.optJSONObject("uid")
-                                if (sessionData != null) {
-                                    val uid = sessionData.optString("uid")
-                                    val aesKey = sessionData.optString("aesKey")
-                                    val aesIv = sessionData.optString("aesIv")
-                                    if (uid.isNotEmpty()) {
-                                        val store = CredentialStore.getInstance(context)
-                                        store.putString(CredentialStore.KEY_UID, uid)
-                                        continuation.resume(Result.success(Unit))
-                                        return@evaluateJavascript
-                                    }
+                                val uid = json.optString("uid")
+                                val name = json.optString("name", "").takeIf { it.isNotEmpty() }
+                                val aesKey = json.optString("aesKey", "").takeIf { it.isNotEmpty() }
+                                val aesIv = json.optString("aesIv", "").takeIf { it.isNotEmpty() }
+                                if (uid.isNotEmpty()) {
+                                    val store = CredentialStore.getInstance(context)
+                                    store.putString(CredentialStore.KEY_UID, uid)
+                                    name?.let { store.putString(CredentialStore.KEY_NAME, it) }
+                                    aesKey?.let { store.putString(CredentialStore.KEY_AES_KEY, it) }
+                                    aesIv?.let { store.putString(CredentialStore.KEY_AES_IV, it) }
+                                    continuation.resume(Result.success(Unit))
+                                    return@evaluateJavascript
                                 }
                             } catch (_: Exception) { }
                         }

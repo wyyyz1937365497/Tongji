@@ -23,8 +23,6 @@ fun SettingsScreen(onNavigateToLogin: () -> Unit = {}) {
     val app = TongjiApp.getInstance()
     val authState by CampusModel.authState.collectAsState()
     val userProfile by CampusModel.userProfile.collectAsState()
-    val termName = TermInfo.simpleName
-    val currentWeek = TermInfo.currentWeek
 
     Log.d("SettingsScreen", "authState=${authState.javaClass.simpleName}, isLoggedIn=${authState.isLoggedIn}")
 
@@ -48,17 +46,23 @@ fun SettingsScreen(onNavigateToLogin: () -> Unit = {}) {
                     Column(Modifier.padding(16.dp)) {
                         Text("账号信息", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(8.dp))
+                        if (userProfile == null) {
+                            Log.w("SettingsScreen", "userProfile 为 null，无法显示账号信息")
+                        }
                         userProfile?.let { profile ->
-                            InfoRow("姓名", profile.name)
+                            Log.d("SettingsScreen", "显示账号信息: name='${profile.name}', uid='${profile.uid}'")
+                            InfoRow("姓名", profile.name.takeIf { it.isNotEmpty() } ?: "(空)")
                             InfoRow("学号", profile.uid)
                             profile.facultyName?.let { InfoRow("学院", it) }
                             profile.deptOrMajor?.let { InfoRow("专业", it) }
                             profile.grade?.let { InfoRow("年级", it) }
                         }
+                        val termName = TermInfo.simpleName
                         if (!termName.isNullOrEmpty()) {
                             Spacer(Modifier.height(4.dp))
                             InfoRow("学期", termName)
                         }
+                        val currentWeek = TermInfo.currentWeek
                         if (currentWeek != null) {
                             InfoRow("周次", "第${currentWeek}周")
                         }

@@ -1,6 +1,7 @@
 package com.example.tongji
 
 import android.app.Application
+import android.util.Log
 import com.example.tongji.auth.CampusModel
 import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.local.AppDatabase
@@ -52,6 +53,27 @@ class TongjiApp : Application() {
         val uid = credentialStore.getString(CredentialStore.KEY_UID)
         if (uid != null) {
             CampusModel.markValid()
+            // 从缓存的凭证初始化 userProfile
+            val name = credentialStore.getString(CredentialStore.KEY_NAME)
+            Log.d("TongjiApp", "从 CredentialStore 读取 KEY_NAME: $name")
+            val facultyName = credentialStore.getString(CredentialStore.KEY_FACULTY)
+            val major = credentialStore.getString(CredentialStore.KEY_MAJOR)
+            val grade = credentialStore.getString(CredentialStore.KEY_GRADE)
+            val photoPath = credentialStore.getString(CredentialStore.KEY_PHOTO_PATH)
+
+            val profile = com.example.tongji.auth.UserProfile(
+                uid = uid,
+                name = name ?: "",
+                facultyName = facultyName,
+                deptOrMajor = major,
+                grade = grade,
+                sexCode = null,
+                typeCode = null,
+                innerRoles = null,
+                photoPath = photoPath
+            )
+            CampusModel.updateProfile(profile)
+            Log.d("TongjiApp", "已初始化 userProfile，name='${profile.name}', uid='${profile.uid}'")
         }
     }
 
