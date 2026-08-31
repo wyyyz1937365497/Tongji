@@ -23,6 +23,9 @@ interface TongjiApi {
     @GET("/api/scoremanagementservice/scoreGrades/getMyGrades")
     suspend fun getMyGrades(@Query("studentId") studentId: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 
+    @GET("/api/scoremanagementservice/labourPracticeHour/queryFinalDetail/{studentId}")
+    suspend fun getPracticeHours(@Path("studentId") studentId: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
+
     @GET("/api/electionservice/reportManagement/findStudentTimetab")
     suspend fun findStudentTimetab(@Query("calendarId") calendarId: String, @Query("studentCode") studentCode: String, @Query("_t") timestamp: Long): Response<Map<String, Any>>
 

@@ -3,15 +3,18 @@ package com.example.tongji.data.repository
 import com.example.tongji.auth.CredentialStore
 import com.example.tongji.data.local.dao.ExamScheduleDao
 import com.example.tongji.data.local.dao.GradeDao
+import com.example.tongji.data.local.dao.PracticeHourDao
 import com.example.tongji.data.local.entity.ExamScheduleItemEntity
 import com.example.tongji.data.local.entity.GradeCourseRecordEntity
 import com.example.tongji.data.local.entity.GradeSummaryEntity
+import com.example.tongji.data.local.entity.PracticeHourRecordEntity
 import com.example.tongji.data.remote.api.TongjiApi
 
 class AcademicRepository(
     private val api: TongjiApi,
     private val examDao: ExamScheduleDao,
     private val gradeDao: GradeDao,
+    private val practiceHourDao: PracticeHourDao,
     private val credentialStore: CredentialStore
 ) {
     suspend fun syncExams(): Result<Unit> = runCatching {
@@ -104,6 +107,45 @@ class AcademicRepository(
     suspend fun getSummary(): GradeSummaryEntity? = gradeDao.getSummary()
     suspend fun getTerms() = gradeDao.getTerms()
     suspend fun getCoursesForTerm(termCode: Int) = gradeDao.getCoursesForTerm(termCode)
+
+    suspend fun syncPracticeHours(): Result<Unit> = runCatching {
+        val studentId = credentialStore.getString(CredentialStore.KEY_UID)
+            ?: return@runCatching
+        val timestamp = System.currentTimeMillis()
+
+        var resp = api.getPracticeHours(studentId, timestamp)
+        var body = resp.body()
+        val code = (body?.get("code") as? Number)?.toInt() ?: -1
+        if (code != 200) {
+            // 与 syncGrades() 相同的 auth 上下文（scoremanagementservice）
+            api.switchAuthContext(mapOf("authId" to 12174))
+            resp = api.getPracticeHours(studentId, System.currentTimeMillis())
+            body = resp.body()
+        }
+        val data = body?.get("data") as? List<Map<String, Any>> ?: return@runCatching
+
+        val records = data.mapNotNull { item -> parsePracticeRecord(item) }
+        practiceHourDao.deleteAll()
+        if (records.isNotEmpty()) {
+            practiceHourDao.insertAll(records)
+        }
+    }
+
+    suspend fun getPracticeRecords(): List<PracticeHourRecordEntity> = practiceHourDao.getAll()
+
+    private fun parsePracticeRecord(item: Map<String, Any>): PracticeHourRecordEntity? {
+        val name = item["name"] as? String ?: return null
+        val plateName = item["plateName"] as? String ?: ""
+        return PracticeHourRecordEntity(
+            calendarId = item["calendarId"] as? String ?: "",
+            plateId = (item["plateId"] as? Number)?.toInt() ?: 0,
+            plateName = plateName,
+            name = name,
+            nature = item["nature"]?.toString() ?: "",
+            hour = (item["hour"] as? Number)?.toDouble() ?: 0.0,
+            activityDate = item["activityDate"] as? String ?: ""
+        )
+    }
 
     private fun parseExamItem(
         item: Map<String, Any>,

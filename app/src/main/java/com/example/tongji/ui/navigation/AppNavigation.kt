@@ -33,6 +33,7 @@ import com.example.tongji.ui.screens.library.SeatMapScreen
 import com.example.tongji.ui.screens.login.LoginScreen
 import com.example.tongji.ui.screens.water.WaterControlScreen
 import com.example.tongji.ui.screens.shuttle.ShuttleScheduleScreen
+import com.example.tongji.ui.screens.practice.PracticeHourScreen
 import com.example.tongji.state.TermInfo
 import kotlinx.coroutines.launch
 
@@ -51,6 +52,7 @@ sealed class Screen(val route: String, val title: String) {
     data object Login : Screen("login", "登录")
     data object WaterControl : Screen("water_control", "智能控水")
     data object ShuttleSchedule : Screen("shuttle_schedule", "班车时刻表")
+    data object Practice : Screen("practice", "社会实践")
 }
 
 data class BottomNavItem(
@@ -131,6 +133,7 @@ fun AppNavigation() {
                     onNavigateToLibrary = { navController.navigate(Screen.Library.route) },
                     onNavigateToWater = { navController.navigate(Screen.WaterControl.route) },
                     onNavigateToShuttle = { navController.navigate(Screen.ShuttleSchedule.route) },
+                    onNavigateToPractice = { navController.navigate(Screen.Practice.route) },
                     onNavigateToLogin = { navController.navigate(Screen.Login.route) }
                 )
             }
@@ -145,6 +148,9 @@ fun AppNavigation() {
             }
             composable(Screen.ShuttleSchedule.route) {
                 ShuttleScheduleScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Practice.route) {
+                PracticeHourScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Activities.route) {
                 ActivityListScreen(onBack = { navController.popBackStack() })

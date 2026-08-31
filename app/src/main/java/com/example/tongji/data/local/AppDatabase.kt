@@ -19,9 +19,10 @@ import com.example.tongji.data.local.entity.*
         LibrarySpaceOverviewEntity::class,
         LibrarySpaceAreaEntity::class,
         LibrarySpaceRoomEntity::class,
-        TeachingNoticeEntity::class
+        TeachingNoticeEntity::class,
+        PracticeHourRecordEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -32,6 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun campusCardDao(): CampusCardDao
     abstract fun librarySpaceDao(): LibrarySpaceDao
     abstract fun teachingNoticeDao(): TeachingNoticeDao
+    abstract fun practiceHourDao(): PracticeHourDao
 
     companion object {
         @Volatile
